@@ -29,12 +29,33 @@ type goodEnvironmentSettings2 struct {
 type badEnvironmentSettings2 struct {
 	Port           string `env:"DB"`
 	PathToDatabase string `env:"DB"`
+	CacheSize      byte   `env:"BADCACHE1"`
+}
+
+// test structure #5
+type badEnvironmentSettings3 struct {
+	Port           string `env:"DB"`
+	PathToDatabase string `env:"DB"`
+	CacheSize      byte   `env:"BADCACHE2"`
+}
+
+// test structure #6
+type badEnvironmentSettings4 struct {
+	Port           string `env:"DB"`
+	PathToDatabase string `env:"DB"`
 	CacheSize      byte   `env:"BADCACHE3"`
 }
 
 func TestLoadUsingReflect(t *testing.T) {
 
-	err := os.Setenv("BADCACHE3", "-1")
+	// ENV settings PORT=80;DB=db/file;CACHE=5;BADCACHE1=i;BADCACHE2=300
+	var err error
+	err = os.Setenv("PORT", "80")
+	err = os.Setenv("DB", "db/file")
+	err = os.Setenv("CACHE", "5")
+	err = os.Setenv("BADCACHE1", "i")
+	err = os.Setenv("BADCACHE2", "300")
+	err = os.Setenv("BADCACHE3", "-1")
 	if err != nil {
 		t.Errorf("ENV variables has not been set")
 	}
@@ -43,6 +64,8 @@ func TestLoadUsingReflect(t *testing.T) {
 	var goodSettings2 goodEnvironmentSettings2
 	var badSettings1 badEnvironmentSettings1
 	var badSettings2 badEnvironmentSettings2
+	var badSettings3 badEnvironmentSettings3
+	var badSettings4 badEnvironmentSettings4
 
 	tests := []struct {
 		name     string
@@ -53,6 +76,8 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"ok2", &goodSettings2, false},
 		{"!ok1", &badSettings1, true},
 		{"!ok2", &badSettings2, true},
+		{"!ok3", &badSettings3, true},
+		{"!ok4", &badSettings4, true},
 	}
 
 	for _, tt := range tests {
