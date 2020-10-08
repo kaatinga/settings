@@ -9,10 +9,8 @@ Example:
 ...
 type EnvironmentSettings struct {
 	Port       string `env:"PORT"`
-	ShadowPath string `env:"USER_LIST"`
-	KeyPath    string `env:"SESSION_KEYS"`
 	Database   string `env:"DATABASE"`
-	CacheSize  uint64 `env:"CACHE_SIZE"`
+	CacheSize  byte `env:"CACHE_SIZE"`
 	LaunchMode string `env:"LAUNCH_MODE"`
 }
 ...
