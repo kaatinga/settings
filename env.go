@@ -14,8 +14,8 @@ func NewSettings() {
 	//TBI
 }
 
-// Deprecated: LoadUsingReflect loads a struct. The struct must contain tag 'env' on every struct field
-// It supports only byte and string field types
+// Deprecated: LoadUsingReflect loads a struct. The struct must contain tag 'env' on every struct field and must be set
+// via pointer. It supports only byte and string field types.
 func LoadUsingReflect(settings interface{}) error {
 
 	// Getting the type
