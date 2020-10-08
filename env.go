@@ -57,6 +57,8 @@ func LoadUsingReflect(settings interface{}) error {
 			}
 
 			v.FieldByName(field).SetUint(uint64(value))
+		default:
+			return errors.New(strings.Join([]string{"unsupported field type. only strings and bytes are supported"}, ""))
 		}
 	}
 
