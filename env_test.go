@@ -1,7 +1,6 @@
 package env_loader
 
 import (
-	"fmt"
 	"os"
 	"testing"
 )
@@ -46,6 +45,25 @@ type badEnvironmentSettings4 struct {
 	CacheSize      byte   `env:"BADCACHE3"`
 }
 
+// test structure #7
+type goodEnvironmentSettings1PlusValidation struct {
+	Port           string `env:"PORT" validate:"numeric"`
+	PathToDatabase string `env:"DB" validate:"required"`
+}
+
+// test structure #8
+type badEnvironmentSettings1PlusValidation struct {
+	Port           string `env:"BADPORT" validate:"numeric"`
+	PathToDatabase string `env:"DB" validate:"required"`
+}
+
+// test structure #9
+type badEnvironmentSettings2PlusValidation struct {
+	Port           string `env:"PORT" validate:"numeric"`
+	PathToDatabase string `env:"DB" validate:"required"`
+	CacheSize      byte   `env:"CACHE" validate:"min=10"`
+}
+
 func TestLoadUsingReflect(t *testing.T) {
 
 	// ENV settings PORT=80;DB=db/file;CACHE=5;BADCACHE1=i;BADCACHE2=300
@@ -56,6 +74,7 @@ func TestLoadUsingReflect(t *testing.T) {
 	err = os.Setenv("BADCACHE1", "i")
 	err = os.Setenv("BADCACHE2", "300")
 	err = os.Setenv("BADCACHE3", "-1")
+	err = os.Setenv("BADPORT", "a")
 	if err != nil {
 		t.Errorf("ENV variables has not been set")
 	}
@@ -66,6 +85,9 @@ func TestLoadUsingReflect(t *testing.T) {
 	var badSettings2 badEnvironmentSettings2
 	var badSettings3 badEnvironmentSettings3
 	var badSettings4 badEnvironmentSettings4
+	var goodSettings5 goodEnvironmentSettings1PlusValidation
+	var badSettings5 badEnvironmentSettings1PlusValidation
+	var badSettings6 badEnvironmentSettings2PlusValidation
 
 	tests := []struct {
 		name     string
@@ -78,6 +100,9 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"!ok2", &badSettings2, true},
 		{"!ok3", &badSettings3, true},
 		{"!ok4", &badSettings4, true},
+		{"ok3", &goodSettings5, false},
+		{"!ok5", &badSettings5, true},
+		{"ok4", &badSettings6, true},
 	}
 
 	for _, tt := range tests {
@@ -87,9 +112,4 @@ func TestLoadUsingReflect(t *testing.T) {
 			}
 		})
 	}
-
-	fmt.Println(err.Error())
-	fmt.Println(goodSettings1)
-	fmt.Println(goodSettings2)
-	fmt.Println(badSettings1)
 }
