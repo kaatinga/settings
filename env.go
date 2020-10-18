@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/kaatinga/assets"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 // NewSettings creates a new settings struct
@@ -31,32 +32,49 @@ func LoadUsingReflect(settings interface{}) error {
 	}
 
 	// временные переменные для цикла обработки параметров окружения ниже
-	var field, tag string
+	var field, envTag, validateTag string
+
+	validate := validator.New()
 
 	for i := 0; i < numberOfFields; i++ {
 		field = t.Field(i).Name // имя поля
 
 		// значение тега env
-		tag = t.Field(i).Tag.Get("env")
-		if tag == "" {
+		envTag = t.Field(i).Tag.Get("env")
+		if envTag == "" {
 			return errors.New(strings.Join([]string{"Ошибка чтения параметра окружения:", field}, " "))
 		}
 
-		envPar, ok := os.LookupEnv(tag)
+		envPar, ok := os.LookupEnv(envTag)
 		if !ok {
-			return errors.New(strings.Join([]string{"environment variable '", tag, "' has not been found for the field '", field, "'"}, ""))
+			return errors.New(strings.Join([]string{"environment variable '", envTag, "' has not been found for the field '", field, "'"}, ""))
 		}
+
+		// значение тега validate
+		validateTag = t.Field(i).Tag.Get("validate")
 
 		switch v.Field(i).Kind() {
 		case reflect.String:
 			v.FieldByName(field).SetString(envPar)
+
+			if validateTag != "" {
+				if err := validate.Var(v.FieldByName(field).String(), validateTag); err != nil {
+					return err
+				}
+			}
 		case reflect.Uint8:
 			value, ok := assets.StByte(envPar)
 			if !ok {
-				return errors.New(strings.Join([]string{"environment variable '", tag, "' has been found but has incorrect value"}, ""))
+				return errors.New(strings.Join([]string{"environment variable '", envTag, "' has been found but has incorrect value"}, ""))
 			}
 
 			v.FieldByName(field).SetUint(uint64(value))
+
+			if validateTag != "" {
+				if err := validate.Var(v.FieldByName(field).Uint(), validateTag); err != nil {
+					return err
+				}
+			}
 		default:
 			return errors.New(strings.Join([]string{"unsupported field type. only strings and bytes are supported"}, ""))
 		}
