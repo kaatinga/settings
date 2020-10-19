@@ -10,11 +10,6 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-// NewSettings creates a new settings struct
-func NewSettings() {
-	//TBI
-}
-
 // Deprecated: LoadUsingReflect loads a struct. The struct must contain tag 'env' on every struct field and must be set
 // via pointer. It supports only byte and string field types.
 func LoadUsingReflect(settings interface{}) error {
@@ -37,7 +32,7 @@ func LoadUsingReflect(settings interface{}) error {
 	validate := validator.New()
 
 	for i := 0; i < numberOfFields; i++ {
-		field = t.Field(i).Name // имя поля
+		field = t.Field(i).Name // field name
 
 		// значение тега env
 		envTag = t.Field(i).Tag.Get("env")
