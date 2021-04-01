@@ -26,7 +26,7 @@ func LoadUsingReflect(settings interface{}) error {
 		return errors.New("the input structure has not fields")
 	}
 
-	// временные переменные для цикла обработки параметров окружения ниже
+	// temporary variables that are reused beneath
 	var field, envTag, validateTag string
 
 	validate := validator.New()
@@ -34,7 +34,7 @@ func LoadUsingReflect(settings interface{}) error {
 	for i := 0; i < numberOfFields; i++ {
 		field = t.Field(i).Name // field name
 
-		// значение тега env
+		// getting the value of the tag 'env' for the field
 		envTag = t.Field(i).Tag.Get("env")
 		if envTag == "" {
 			return errors.New(strings.Join([]string{"reading environment variables failed:", field}, " "))
@@ -45,7 +45,7 @@ func LoadUsingReflect(settings interface{}) error {
 			return errors.New(strings.Join([]string{"environment variable '", envTag, "' has not been found for the field '", field, "'"}, ""))
 		}
 
-		// значение тега validate
+		// getting the value of the tag 'validate' for the field
 		validateTag = t.Field(i).Tag.Get("validate")
 
 		switch v.Field(i).Kind() {
