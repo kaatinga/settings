@@ -23,7 +23,7 @@ func LoadUsingReflect(settings interface{}) error {
 	// Reading the number of fields in the settings structure
 	numberOfFields := t.NumField()
 	if numberOfFields == 0 {
-		return errors.New("the input structure has not fields")
+		return ErrTheModelHasNoFields
 	}
 
 	// temporary variables that are reused beneath

@@ -1,7 +1,8 @@
 package env_loader
 
-import "github.com/kaatinga/const-errs"
+import cer "github.com/kaatinga/const-errs"
 
 const (
-	ErrUnsupportedField const_errs.Error = "unsupported field type. only strings and bytes are supported"
+	ErrUnsupportedField    cer.Error = "unsupported field type. only strings and bytes are supported"
+	ErrTheModelHasNoFields cer.Error = "the input structure has not fields"
 )
