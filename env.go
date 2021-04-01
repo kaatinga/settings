@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/kaatinga/assets"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 // Deprecated: LoadUsingReflect loads a struct. The struct must contain tag 'env' on every struct field and must be set
@@ -37,7 +37,7 @@ func LoadUsingReflect(settings interface{}) error {
 		// значение тега env
 		envTag = t.Field(i).Tag.Get("env")
 		if envTag == "" {
-			return errors.New(strings.Join([]string{"Ошибка чтения параметра окружения:", field}, " "))
+			return errors.New(strings.Join([]string{"reading environment variables failed:", field}, " "))
 		}
 
 		envPar, ok := os.LookupEnv(envTag)
@@ -71,7 +71,7 @@ func LoadUsingReflect(settings interface{}) error {
 				}
 			}
 		default:
-			return errors.New(strings.Join([]string{"unsupported field type. only strings and bytes are supported"}, ""))
+			return ErrUnsupportedField
 		}
 	}
 
