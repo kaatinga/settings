@@ -1,9 +1,24 @@
 package env_loader
 
 import (
+	"errors"
+	"github.com/davecgh/go-spew/spew"
 	"os"
 	"testing"
 )
+
+type NotAStruct string
+
+// complex example
+type settingsWithStruct struct {
+	Port           string `env:"PORT"`
+	PathToDatabase string `env:"DB"`
+	Internal       *InternalStruct
+}
+
+type InternalStruct struct {
+	CacheSize string `env:"CACHE"`
+}
 
 // test structure #1
 type goodEnvironmentSettings1 struct {
@@ -12,35 +27,35 @@ type goodEnvironmentSettings1 struct {
 }
 
 // test structure #2
-type badEnvironmentSettings1 struct {
+type goodEnvironmentSettings3withEmptyString struct {
 	Port           string
 	PathToDatabase string `env:"DB"`
 }
 
 // test structure #3
 type goodEnvironmentSettings2 struct {
-	Port           string `env:"DB"`
+	Port           string `env:"PORT"`
 	PathToDatabase string `env:"DB"`
 	CacheSize      byte   `env:"CACHE"`
 }
 
 // test structure #4
 type badEnvironmentSettings2 struct {
-	Port           string `env:"DB"`
+	Port           string `env:"PORT"`
 	PathToDatabase string `env:"DB"`
 	CacheSize      byte   `env:"BADCACHE1"`
 }
 
 // test structure #5
 type badEnvironmentSettings3 struct {
-	Port           string `env:"DB"`
+	Port           string `env:"PORT"`
 	PathToDatabase string `env:"DB"`
 	CacheSize      byte   `env:"BADCACHE2"`
 }
 
 // test structure #6
 type badEnvironmentSettings4 struct {
-	Port           string `env:"DB"`
+	Port           string `env:"PORT"`
 	PathToDatabase string `env:"DB"`
 	CacheSize      byte   `env:"BADCACHE3"`
 }
@@ -80,36 +95,52 @@ func TestLoadUsingReflect(t *testing.T) {
 	}
 
 	var goodSettings1 goodEnvironmentSettings1
-	var goodSettings2 goodEnvironmentSettings2
-	var badSettings1 badEnvironmentSettings1
+	var goodSettings3withEmptyString goodEnvironmentSettings3withEmptyString
+	var withoutPointer goodEnvironmentSettings2
 	var badSettings2 badEnvironmentSettings2
 	var badSettings3 badEnvironmentSettings3
 	var badSettings4 badEnvironmentSettings4
 	var goodSettings5 goodEnvironmentSettings1PlusValidation
 	var badSettings5 badEnvironmentSettings1PlusValidation
 	var badSettings6 badEnvironmentSettings2PlusValidation
+	var notAStruct NotAStruct
+	var complex1 = &settingsWithStruct{
+		Port:           "",
+		PathToDatabase: "",
+		Internal:       new(InternalStruct),
+	}
+
+	var validation error
 
 	tests := []struct {
 		name     string
 		settings interface{}
-		wantErr  bool
+		wantErr  error
 	}{
-		{"ok1", &goodSettings1, false},
-		{"ok2", &goodSettings2, false},
-		{"!ok1", &badSettings1, true},
-		{"!ok2", &badSettings2, true},
-		{"!ok3", &badSettings3, true},
-		{"!ok4", &badSettings4, true},
-		{"ok3", &goodSettings5, false},
-		{"!ok5", &badSettings5, true},
-		{"ok4", &badSettings6, true},
+		{"ok1", &goodSettings1, nil},
+		{"ok2", &goodSettings3withEmptyString, nil},
+		{"!ok1", withoutPointer, ErrNotAddressable},
+		{"!ok2", &badSettings2, ErrIncorrectFieldValue},
+		{"!ok3", &badSettings3, ErrIncorrectFieldValue},
+		{"!ok4", &badSettings4, ErrIncorrectFieldValue},
+		{"ok3", &goodSettings5, nil},
+		{"!ok5", &badSettings5, validation},
+		{"!ok6", &badSettings6, validation},
+		{"!ok7", notAStruct, ErrNotAStruct},
+		{"!ok8", &notAStruct, ErrNotAStruct},
+		{"complex1", &complex1, nil},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err = LoadUsingReflect(tt.settings); (err != nil) != tt.wantErr {
-				t.Errorf("LoadUsingReflect() error = %v, wantErr %v", err, tt.wantErr)
+			err = LoadUsingReflect(tt.settings)
+			if !(errors.Is(err, tt.wantErr) || tt.wantErr == validation) {
+				t.Errorf("LoadUsingReflect() error is incorrect\nhave %v\nwant %v", err, tt.wantErr)
 			}
 		})
+
+		if err == nil {
+			spew.Dump(tt.settings)
+		}
 	}
 }
