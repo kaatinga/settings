@@ -16,11 +16,11 @@ The settings must be formed as struct with byte and string fields.
 
 Use go get.
 
-	go get gitlab.mt-tech.ru/go-libs/settings
+	go get github.com/kaatinga/env_loader
 
 Then import the validator package into your own code.
 
-	import "gitlab.mt-tech.ru/go-libs/settings"
+	import "github.com/kaatinga/env_loader"
 
 <a name="example"></a>
 
