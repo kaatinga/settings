@@ -29,10 +29,10 @@ Then import the validator package into your own code.
 ```go
 ...
 type EnvironmentSettings struct {
-Port       string `cfg:"PORT validate:"numeric"`
-Database   string `cfg:"DATABASE"`
-CacheSize  byte `cfg:"CACHE_SIZE"`
-LaunchMode string `cfg:"LAUNCH_MODE"`
+    Port       string `cfg:"PORT validate:"numeric"`
+    Database   string `cfg:"DATABASE"`
+    CacheSize  byte `cfg:"CACHE_SIZE"`
+    LaunchMode string `cfg:"LAUNCH_MODE"`
 }
 
 err := LoadUsingReflect(&EnvironmentSettings)
