@@ -1,77 +1,115 @@
 package env_loader
 
 import (
-	"errors"
-	"os"
-	"reflect"
-	"strings"
-
 	"github.com/go-playground/validator/v10"
 	"github.com/kaatinga/assets"
+	"os"
+	"reflect"
 )
 
-// Deprecated: LoadUsingReflect loads a struct. The struct must contain tag 'env' on every struct field and must be set
+// LoadUsingReflect loads a struct. The struct must contain tag 'env' on every struct field and must be set
 // via pointer. It supports only byte and string field types.
 func LoadUsingReflect(settings interface{}) error {
 
-	// Getting the type
-	t := reflect.TypeOf(settings).Elem()
+	var settingsEngine *SettingsStruct
 
-	// Getting the value
-	v := reflect.ValueOf(settings).Elem()
+	var ok bool
+	if settingsEngine, ok = settings.(*SettingsStruct); !ok {
+		//fmt.Println("this is root struct")
+		settingsEngine = newSettingsStruct(settings)
+	}
+
+	settingsEngine.getStruct()
+
+	// the main model must be a struct
+	if settingsEngine.Type.Kind() != reflect.Struct {
+		return ErrNotAStruct
+	}
 
 	// Reading the number of fields in the settings structure
-	numberOfFields := t.NumField()
+	numberOfFields := settingsEngine.Type.NumField()
 	if numberOfFields == 0 {
 		return ErrTheModelHasNoFields
 	}
 
 	// temporary variables that are reused beneath
-	var field, envTag, validateTag string
+	var envTag, envPar, validateTag string
+	var fieldType reflect.StructField
+	var fieldValue reflect.Value
 
 	validate := validator.New()
 
 	for i := 0; i < numberOfFields; i++ {
-		field = t.Field(i).Name // field name
+		fieldType = settingsEngine.Type.Field(i)
+		fieldValue = settingsEngine.Value.FieldByName(fieldType.Name)
 
-		// getting the value of the tag 'env' for the field
-		envTag = t.Field(i).Tag.Get("env")
-		if envTag == "" {
-			return errors.New(strings.Join([]string{"reading environment variables failed:", field}, " "))
-		}
+		//fmt.Println(fieldValue.Type().Name())
+		//fmt.Println("reflect field check passed", fieldType.Name)
 
-		envPar, ok := os.LookupEnv(envTag)
+		// getting the fieldValue of the tag 'env' for the field
+		envTag, ok = fieldType.Tag.Lookup("env")
 		if !ok {
-			return errors.New(strings.Join([]string{"environment variable '", envTag, "' has not been found for the field '", field, "'"}, ""))
-		}
 
-		// getting the value of the tag 'validate' for the field
-		validateTag = t.Field(i).Tag.Get("validate")
-
-		switch v.Field(i).Kind() {
-		case reflect.String:
-			v.FieldByName(field).SetString(envPar)
-
-			if validateTag != "" {
-				if err := validate.Var(v.FieldByName(field).String(), validateTag); err != nil {
+			if fieldValue.Kind() == reflect.Ptr {
+				err := LoadUsingReflect(&SettingsStruct{
+					Value: fieldValue,
+					Type:  fieldValue.Type(),
+				})
+				if err != nil {
 					return err
 				}
+				continue
 			}
-		case reflect.Uint8:
-			value, ok := assets.StByte(envPar)
+			//fmt.Println("the field", fieldType.Name, "will be omitted as it has no 'env' tag")
+			continue
+
+		} else {
+
+			//fmt.Println("envTag", envTag)
+			envPar, ok = os.LookupEnv(envTag)
 			if !ok {
-				return errors.New(strings.Join([]string{"environment variable '", envTag, "' has been found but has incorrect value"}, ""))
+				return EnvironmentVariableNotFound(envTag)
 			}
 
-			v.FieldByName(field).SetUint(uint64(value))
+			// getting the fieldValue of the tag 'validate' for the field
+			validateTag = fieldType.Tag.Get("validate")
 
-			if validateTag != "" {
-				if err := validate.Var(v.FieldByName(field).Uint(), validateTag); err != nil {
-					return err
+			if settingsEngine.Value.Field(i).IsValid() {
+				// The struct must be send via pointer.
+				if !settingsEngine.Value.Field(i).CanSet() {
+					return ErrNotAddressable
 				}
+			} else {
+				return ErrInternalFailure
 			}
-		default:
-			return ErrUnsupportedField
+
+			switch fieldValue.Kind() {
+			case reflect.String:
+
+				fieldValue.SetString(envPar)
+
+				if validateTag != "" {
+					if err := validate.Var(fieldValue.String(), validateTag); err != nil {
+						return err
+					}
+				}
+			case reflect.Uint8:
+				var byteValue byte
+				byteValue, ok = assets.StByte(envPar)
+				if !ok {
+					return IncorrectFieldValue(envTag)
+				}
+
+				fieldValue.SetUint(uint64(byteValue))
+
+				if validateTag != "" {
+					if err := validate.Var(fieldValue.Uint(), validateTag); err != nil {
+						return err
+					}
+				}
+			default:
+				return ErrUnsupportedField
+			}
 		}
 	}
 
