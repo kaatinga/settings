@@ -81,4 +81,4 @@ if err != nil {
 ...
 ```
 
-Otherwise, the function returns an error.
+Otherwise, the function returns error.
