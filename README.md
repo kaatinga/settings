@@ -12,7 +12,7 @@ The settings must be formed as struct with byte and string fields.
 
 <a name="installation"></a>
 
-## Installation
+## 1. Installation
 
 Use go get.
 
@@ -24,15 +24,15 @@ Then import the validator package into your own code.
 
 <a name="example"></a>
 
-## Example
+## 2. Example
 
 ```go
 ...
 type EnvironmentSettings struct {
-    Port       string `cfg:"PORT validate:"numeric"`
-    Database   string `cfg:"DATABASE"`
-    CacheSize  byte `cfg:"CACHE_SIZE"`
-    LaunchMode string `cfg:"LAUNCH_MODE"`
+    Port       string `env:"PORT validate:"numeric"`
+    Database   string `env:"DATABASE"`
+    CacheSize  byte `env:"CACHE_SIZE"`
+    LaunchMode string `env:"LAUNCH_MODE"`
 }
 
 err := LoadUsingReflect(&EnvironmentSettings)
@@ -45,7 +45,7 @@ if err != nil {
 
 <a name="limits"></a>
 
-## Limitations
+## 3. Limitations
 
 The configuration model has some limitations in the way how it is arranged.
 
@@ -55,12 +55,12 @@ First of all, the the wrapped structs must be pointed out via pointer.
 ...
 
 type Model2 struct {
-    CacheSize   byte `cfg:"CACHE_SIZE"`
+    CacheSize   byte `env:"CACHE_SIZE"`
 }
 
 type Model1 struct {
-    Port        string `cfg:"PORT validate:"numeric"`
-    Database    string `cfg:"DATABASE"`
+    Port        string `env:"PORT validate:"numeric"`
+    Database    string `env:"DATABASE"`
     Model2      *Model2
 }
 
