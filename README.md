@@ -49,7 +49,7 @@ if err != nil {
 
 The configuration model has some limitations in the way how it is arranged.
 
-First of all, the the wrapped structs must be pointed out via pointer. 
+First of all, the the nested structs must be pointed out via pointer. 
 
 ```go
 ...
@@ -67,7 +67,7 @@ type Model1 struct {
 ...
 ```
 
-The root model must be also added to the LoadUsingReflect() signature as pointer:
+The root model must be also added to the LoadUsingReflect() signature via pointer:
 
 ```go
 
@@ -81,4 +81,4 @@ if err != nil {
 ...
 ```
 
-Otherwise, the function return an error.
+Otherwise, the function returns an error.
