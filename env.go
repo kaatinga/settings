@@ -46,7 +46,7 @@ func LoadUsingReflect(settings interface{}) error {
 		//fmt.Println(fieldValue.Type().Name())
 		//fmt.Println("reflect field check passed", fieldType.Name)
 
-		// getting the fieldValue of the tag 'env' for the field
+		// getting the value of the tag 'env' for the field
 		envTag, ok = fieldType.Tag.Lookup("env")
 		if !ok {
 
@@ -71,7 +71,7 @@ func LoadUsingReflect(settings interface{}) error {
 				return EnvironmentVariableNotFound(envTag)
 			}
 
-			// getting the fieldValue of the tag 'validate' for the field
+			// getting the value of the tag 'validate' for the field
 			validateTag = fieldType.Tag.Get("validate")
 
 			if settingsEngine.Value.Field(i).IsValid() {
