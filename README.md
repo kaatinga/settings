@@ -28,7 +28,7 @@ Then import the validator package into your own code.
 
 ### How to use
 
-Create a settings model where you can you tags `env` and `validate`.
+Create a settings model where you can use tags `env` and `validate`.
 Announce a variable and call `LoadUsingReflect()`:
 
 ```go
