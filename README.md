@@ -24,23 +24,58 @@ Then import the validator package into your own code.
 
 <a name="example"></a>
 
-## 2. Example
+## 2. Description
+
+### How to use
+
+Create a settings model where you can you tags `env` and `validate`.
+Announce a variable and call `LoadUsingReflect()`:
 
 ```go
-...
-type EnvironmentSettings struct {
+type settings struct {
     Port       string `env:"PORT validate:"numeric"`
     Database   string `env:"DATABASE"`
     CacheSize  byte `env:"CACHE_SIZE"`
     LaunchMode string `env:"LAUNCH_MODE"`
 }
 
-err := LoadUsingReflect(&EnvironmentSettings)
+var settings Settings
+err := LoadUsingReflect(&settings)
 if err != nil {
     return err
 }
+```
 
-...
+### Supported types
+
+| Type                   | Real type     |
+| -------------          | ------------- |
+| string                 | -             | 
+| boolean                | -             | 
+| any uint               | -             | 
+| int, int64             | -             | 
+| logrus.Level           | uint32        | 
+| syslog.Priority        | int           | 
+| time.Duration          | int64         | 
+
+### Nested structs
+
+The nested structs can be pointer out via pointer or without pointer. Example:
+
+```go
+type Model2 struct {
+    CacheSize   byte `env:"CACHE_SIZE"`
+}
+
+type Model3 struct {
+    Port        string `env:"PORT validate:"numeric"`
+}
+
+type Model1 struct {
+    Database    string `env:"DATABASE"`
+    Model2      *Model2
+    Model3      Model3
+}
 ```
 
 <a name="limits"></a>
@@ -49,36 +84,13 @@ if err != nil {
 
 The configuration model has some limitations in the way how it is arranged.
 
-First of all, the the nested structs must be pointed out via pointer. 
-
-```go
-...
-
-type Model2 struct {
-    CacheSize   byte `env:"CACHE_SIZE"`
-}
-
-type Model1 struct {
-    Port        string `env:"PORT validate:"numeric"`
-    Database    string `env:"DATABASE"`
-    Model2      *Model2
-}
-
-...
-```
-
 The root model must be also added to the LoadUsingReflect() signature via pointer:
 
 ```go
-
-...
-
 err := LoadUsingReflect(&EnvironmentSettings)
 if err != nil {
     return err
 }
-
-...
 ```
 
 Otherwise, the function returns error.
