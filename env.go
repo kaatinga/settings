@@ -1,117 +1,161 @@
 package env_loader
 
 import (
-	"github.com/go-playground/validator/v10"
-	"github.com/kaatinga/assets"
-	"os"
+	"log/syslog"
 	"reflect"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 // LoadUsingReflect loads a struct. The struct must contain tag 'env' on every struct field and must be set
 // via pointer. It supports only byte and string field types.
 func LoadUsingReflect(settings interface{}) error {
 
-	var settingsEngine *SettingsStruct
-
-	var ok bool
-	if settingsEngine, ok = settings.(*SettingsStruct); !ok {
-		//fmt.Println("this is root struct")
-		settingsEngine = newSettingsStruct(settings)
+	engine, ok := settings.(*Engine)
+	if !ok {
+		engine = newEngine(settings)
 	}
 
-	settingsEngine.getStruct()
-
-	// the main model must be a struct
-	if settingsEngine.Type.Kind() != reflect.Struct {
-		return ErrNotAStruct
+	err := engine.getStruct()
+	if err != nil {
+		return err
 	}
 
-	// Reading the number of fields in the settings structure
-	numberOfFields := settingsEngine.Type.NumField()
-	if numberOfFields == 0 {
-		return ErrTheModelHasNoFields
-	}
+	for i := 0; i < engine.NumberOfFields; i++ {
+		engine.startIteration(i)
 
-	// temporary variables that are reused beneath
-	var envTag, envPar, validateTag string
-	var fieldType reflect.StructField
-	var fieldValue reflect.Value
+		//fmt.Println(engine.Loop.field.Name, "has toml tag:", engine.Loop.hasTomlTag)
 
-	validate := validator.New()
+		if engine.Loop.fieldValue.Kind() == reflect.Ptr ||
+			engine.Loop.fieldValue.Kind() == reflect.Struct {
+			// Мы проверяем а не вложенная ли это структура
 
-	for i := 0; i < numberOfFields; i++ {
-		fieldType = settingsEngine.Type.Field(i)
-		fieldValue = settingsEngine.Value.FieldByName(fieldType.Name)
-
-		//fmt.Println(fieldValue.Type().Name())
-		//fmt.Println("reflect field check passed", fieldType.Name)
-
-		// getting the value of the tag 'env' for the field
-		envTag, ok = fieldType.Tag.Lookup("env")
-		if !ok {
-
-			if fieldValue.Kind() == reflect.Ptr {
-				err := LoadUsingReflect(&SettingsStruct{
-					Value: fieldValue,
-					Type:  fieldValue.Type(),
-				})
-				if err != nil {
-					return err
-				}
-				continue
+			err = LoadUsingReflect(&Engine{
+				Value: engine.Loop.fieldValue,
+				Type:  engine.Loop.fieldValue.Type(),
+			})
+			if err != nil {
+				return err
 			}
-			//fmt.Println("the field", fieldType.Name, "will be omitted as it has no 'env' tag")
 			continue
 
 		} else {
 
-			//fmt.Println("envTag", envTag)
-			envPar, ok = os.LookupEnv(envTag)
-			if !ok {
-				return EnvironmentVariableNotFound(envTag)
+			// if a field has no env tag, we pass such a field
+			if !engine.Loop.hasEnvTag {
+				continue
 			}
 
-			// getting the value of the tag 'validate' for the field
-			validateTag = fieldType.Tag.Get("validate")
-
-			if settingsEngine.Value.Field(i).IsValid() {
-				// The struct must be send via pointer.
-				if !settingsEngine.Value.Field(i).CanSet() {
-					return ErrNotAddressable
-				}
-			} else {
+			if !engine.Value.Field(i).IsValid() {
 				return ErrInternalFailure
 			}
 
-			switch fieldValue.Kind() {
+			// The struct must be send via pointer.
+			if !engine.Value.Field(i).CanSet() {
+				return ErrNotAddressable
+			}
+
+			//fmt.Println(engine.Value.Field(i).Type().String(), "can be changed")
+
+			switch engine.Loop.fieldValue.Kind() {
 			case reflect.String:
+				engine.Loop.fieldValue.SetString(engine.Loop.envValue)
+			case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uint:
 
-				fieldValue.SetString(envPar)
+				if engine.Loop.fieldValue.Kind() == reflect.Uint32 &&
+					engine.Loop.fieldValue.Type().String() == logLevel {
+					// check if it is logrus.level
 
-				if validateTag != "" {
-					if err := validate.Var(fieldValue.String(), validateTag); err != nil {
+					var level logrus.Level
+					level, err = logrus.ParseLevel(engine.Loop.envValue)
+					if err != nil {
+						return incorrectFieldValue(engine.Loop.envTag)
+					}
+					engine.Loop.uint64Value = uint64(level)
+
+				} else {
+					// uint
+
+					engine.Loop.uint64Value, err = strconv.ParseUint(engine.Loop.envValue, 10, 64)
+					if err != nil {
+						return incorrectFieldValue(engine.Loop.envTag)
+					}
+
+					// check if whether the value exceeds the type maximum or not
+					if engine.Loop.uint64Value > maximum(engine.Loop.fieldValue.Kind()) {
+						return incorrectFieldValue(engine.Loop.envTag)
+					}
+				}
+
+				engine.Loop.fieldValue.SetUint(engine.Loop.uint64Value)
+
+			case reflect.Int64, reflect.Int:
+
+				if engine.Loop.fieldValue.Kind() == reflect.Int &&
+					engine.Loop.fieldValue.Type().String() == syslogPriority {
+					// check if it is syslog.Priority
+
+					var priority syslog.Priority
+					priority, err = ParseSyslogPriority(engine.Loop.envValue)
+					if err != nil {
+						return incorrectFieldValue(engine.Loop.envTag)
+					}
+
+					engine.Loop.int64Value = int64(priority)
+
+				} else if engine.Loop.fieldValue.Kind() == reflect.Int64 &&
+					engine.Loop.fieldValue.Type().String() == duration {
+					// check if it is time.Duration
+
+					engine.Loop.durationValue, err = time.ParseDuration(engine.Loop.envValue)
+					if err != nil {
+						return err
+					}
+					engine.Loop.int64Value = engine.Loop.durationValue.Nanoseconds()
+
+				} else {
+					// int
+
+					engine.Loop.int64Value, err = strconv.ParseInt(engine.Loop.envValue, 10, 64)
+					if err != nil {
 						return err
 					}
 				}
-			case reflect.Uint8:
-				var byteValue byte
-				byteValue, ok = assets.StByte(envPar)
-				if !ok {
-					return IncorrectFieldValue(envTag)
-				}
 
-				fieldValue.SetUint(uint64(byteValue))
+				engine.Loop.fieldValue.SetInt(engine.Loop.int64Value)
 
-				if validateTag != "" {
-					if err := validate.Var(fieldValue.Uint(), validateTag); err != nil {
-						return err
-					}
-				}
+			case reflect.Bool:
+				engine.Loop.fieldValue.SetBool(strings.ToLower(engine.Loop.envValue) == "true")
 			default:
-				return ErrUnsupportedField
+				return unsupportedField(engine.Loop.fieldValue.Type().Name())
+			}
+
+			//fmt.Println("установленное значение :", fieldValue.Interface())
+
+			err = engine.validate()
+			if err != nil {
+				return err
 			}
 		}
 	}
-
 	return nil
+}
+
+// maximum returns the type's maximum value.
+func maximum(kind reflect.Kind) uint64 {
+	switch kind {
+	case reflect.Uint8:
+		return 255
+	case reflect.Uint16:
+		return 65535
+	case reflect.Uint32:
+		return 4294967295
+	case reflect.Uint64, reflect.Uint:
+		return 18446744073709551615
+	default:
+		return 0
+	}
 }
