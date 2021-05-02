@@ -1,11 +1,11 @@
-package settings
+package env_loader
 
 import (
 	"log/syslog"
 	"strings"
 )
 
-// ParseSyslogPriority конвертирует уровень логирования для syslog.
+// ParseSyslogPriority converts string to syslog.Priority.
 func ParseSyslogPriority(lvl string) (syslog.Priority, error) {
 
 	switch strings.ToLower(lvl) {
@@ -29,7 +29,7 @@ func ParseSyslogPriority(lvl string) (syslog.Priority, error) {
 	return p, incorrectPriority(lvl)
 }
 
-// priorityDescription выводит текстовое описание приоритета syslog.
+// priorityDescription returns description for syslog.Priority.
 func priorityDescription(priority syslog.Priority) string {
 	switch priority {
 	case syslog.LOG_DEBUG:
