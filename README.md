@@ -60,7 +60,7 @@ if err != nil {
 
 ### Nested structs
 
-The nested structs can be pointer out via pointer or without pointer. Example:
+The nested structs can be added via pointer or without pointer. Example:
 
 ```go
 type Model2 struct {
