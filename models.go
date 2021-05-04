@@ -39,17 +39,17 @@ type Loop struct {
 	mustBeValidated bool
 }
 
-// getStruct проверяет и возвращает структуру для работы.
+// getStruct checks and returns a struct to process.
 func (engine *Engine) getStruct() error {
 	if engine.Value.Kind() == reflect.Ptr {
 
-		// инитим структуру если она не заинитина
+		// initing struct if it is added via pointer
 		if engine.Value.IsNil() {
 
-			// основная структура если не объявлена, мы не можем ее создать
+			// the main struct must be inited
 			// the third law of reflection
 			// https://blog.golang.org/laws-of-reflection
-			// мы не можем сетить в нил, а больше некуда
+			// we have no parameter to change value
 			if !engine.Value.CanSet() {
 				return ErrNotAddressable
 			}
@@ -68,12 +68,12 @@ func (engine *Engine) getStruct() error {
 		}
 	}
 
-	// проверяем что kind — структура
+	// checking that kind us a struct
 	if engine.Type.Kind() != reflect.Struct {
 		return ErrNotAStruct
 	}
 
-	// Определяем кол-во полей в данной структуре.
+	// checking the number of the fields in the struct.
 	engine.NumberOfFields = engine.Type.NumField()
 	if engine.NumberOfFields == 0 {
 		return ErrTheModelHasNoFields
@@ -82,7 +82,7 @@ func (engine *Engine) getStruct() error {
 	return nil
 }
 
-// validationFailed возвращает ошибку валидации.
+// validationFailed forms validation error.
 func (engine *Engine) validationFailed() error {
 	return &validationFailed{
 		Name:           engine.Loop.field.Name,
@@ -91,7 +91,7 @@ func (engine *Engine) validationFailed() error {
 	}
 }
 
-// validate проверяем текущее значение в цикле если это необходимо.
+// validate validates the current value using `validate` tag.
 func (engine *Engine) validate() error {
 
 	// получаем значение тега 'validate' для поля
@@ -99,6 +99,7 @@ func (engine *Engine) validate() error {
 	if engine.Loop.mustBeValidated {
 		err := engine.Validate.Var(engine.Loop.fieldValue.Interface(), engine.Loop.validationRule)
 		if err != nil {
+			//fmt.Println(err)
 			return engine.validationFailed()
 		}
 	}
@@ -106,11 +107,12 @@ func (engine *Engine) validate() error {
 	return nil
 }
 
-// startIteration запускает новую итерацию для обхода полей структуры.
+// startIteration launches field processing.
 func (engine *Engine) startIteration(i int) {
 	engine.Loop.field = engine.Type.Field(i)
 	engine.Loop.fieldValue = engine.Value.FieldByName(engine.Loop.field.Name)
 
 	// receiving env tag
 	engine.Loop.envTag, engine.Loop.hasEnvTag = engine.Loop.field.Tag.Lookup(env)
+	//fmt.Println(engine.Loop.envTag, engine.Loop.hasEnvTag)
 }
