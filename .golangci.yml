@@ -147,11 +147,11 @@ linters-settings:
     lines: 60
     statements: 40
 
-  gci:
+#  gci:
     # put imports beginning with prefix after 3rd-party packages;
     # only support one prefix
     # if not set, use goimports.local-prefixes
-    local-prefixes: github.com/org/project
+#    local-prefixes: github.com/org/project
 
   gocognit:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
@@ -285,10 +285,10 @@ linters-settings:
 #    template-path:
     # also as alternative of directive 'template' you may put the path to file with the template source
 
-  goimports:
+#  goimports:
     # put imports beginning with prefix after 3rd-party packages;
     # it's a comma-separated list of prefixes
-    local-prefixes: github.com/org/project
+#    local-prefixes: github.com/org/project
 
   golint:
     # minimal confidence for issues, default is 0.8
@@ -307,8 +307,8 @@ linters-settings:
     # Allow local `replace` directives. Default is false.
     replace-local: false
     # List of allowed `replace` directives. Default is empty.
-    replace-allow-list:
-      - launchpad.net/gocheck
+#    replace-allow-list:
+#      - launchpad.net/gocheck
     # Allow to not explain why the version has been retracted in the `retract` directives. Default is false.
     retract-allow-no-explanation: false
     # Forbid the use of the `exclude` directives. Default is false.
@@ -468,7 +468,7 @@ linters-settings:
 
   nolintlint:
     # Enable to ensure that nolint directives are all used. Default is true.
-    allow-unused: false
+    allow-unused: true
     # Disable to ensure that nolint directives don't have a leading space. Default is true.
     allow-leading-space: true
     # Exclude following linters from requiring an explanation.  Default is [].
@@ -481,7 +481,7 @@ linters-settings:
   rowserrcheck:
     packages:
       - github.com/jmoiron/sqlx
-      -
+#      -
   revive:
     # see https://github.com/mgechev/revive#available-rules for details.
     ignore-generated-header: true
@@ -665,13 +665,13 @@ issues:
   new: false
 
   # Show only new issues created after git revision `REV`
-  new-from-rev: REV
+#  new-from-rev: REV
 
   # Show only new issues created in git patch with set file path.
-  new-from-patch: path/to/patch/file
+#  new-from-patch: path/to/patch/file
 
   # Fix found issues (if it's supported by the linter)
-  fix: true
+#  fix: true
 
 severity:
   # Default value is empty string.
