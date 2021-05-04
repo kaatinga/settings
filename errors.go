@@ -10,9 +10,8 @@ const (
 
 	ErrInternalFailure     cer.Error = "an internal package error"
 	ErrIncorrectFieldValue cer.Error = "variable has been found but has incorrect value"
-	ErrVariableNotFound    cer.Error = "variable has not been found"
 	ErrValidationFailed    cer.Error = "field validation failed"
-	ErrIncorrectPriority cer.Error = "incorrect syslog priority"
+	ErrIncorrectPriority   cer.Error = "incorrect syslog priority"
 )
 
 type unsupportedField string
@@ -22,11 +21,7 @@ func (err unsupportedField) Error() string {
 }
 
 func (err unsupportedField) Is(target error) bool {
-	if target == ErrUnsupportedField {
-		return true
-	}
-
-	return false
+	return target == ErrUnsupportedField
 }
 
 type incorrectFieldValue string
@@ -36,25 +31,7 @@ func (err incorrectFieldValue) Error() string {
 }
 
 func (err incorrectFieldValue) Is(target error) bool {
-	if target == ErrIncorrectFieldValue {
-		return true
-	}
-
-	return false
-}
-
-type variableNotFound string
-
-func (err variableNotFound) Error() string {
-	return "variable " + string(err) + " has not been found"
-}
-
-func (err variableNotFound) Is(target error) bool {
-	if target == ErrVariableNotFound {
-		return true
-	}
-
-	return false
+	return target == ErrIncorrectFieldValue
 }
 
 type validationFailed struct {
@@ -68,11 +45,7 @@ func (err *validationFailed) Error() string {
 }
 
 func (err *validationFailed) Is(target error) bool {
-	if target == ErrValidationFailed {
-		return true
-	}
-
-	return false
+	return target == ErrValidationFailed
 }
 
 // incorrectPriority — error for ParseSyslogPriority()
@@ -83,9 +56,5 @@ func (err incorrectPriority) Error() string {
 }
 
 func (err incorrectPriority) Is(target error) bool {
-	if target == ErrIncorrectPriority {
-		return true
-	}
-
-	return false
+	return target == ErrIncorrectPriority
 }
