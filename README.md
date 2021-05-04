@@ -13,7 +13,7 @@ The settings must be formed as struct with byte and string fields.
 2. [Example](#example)
 3. [Limitations](#limits)
 
-<a name="installation"></a>
+<a name=installation></a>
 
 ## 1. Installation
 
@@ -25,7 +25,7 @@ Then import the validator package into your own code.
 
 	import "github.com/kaatinga/env_loader"
 
-<a name="example"></a>
+<a name=example></a>
 
 ## 2. Description
 
@@ -81,7 +81,7 @@ type Model1 struct {
 }
 ```
 
-The nested structs added via pointer must be necessarily created:
+Nested structs added via pointer must not be necessarily created:
 
 ```go
 var settings Model1
@@ -101,13 +101,19 @@ if err != nil {
 }
 ```
 
-<a name="limits"></a>
+<a name=limits></a>
 
 ## 3. Limitations
 
-The configuration model has some limitations in the way how it is arranged.
+The configuration model has some limitations in the way how it is arranged and used.
 
-The root model must be also added to the LoadUsingReflect() signature via pointer:
+### Empty structs are not allowed
+
+If you add an empty struct to your configuration model, `LoadUsingReflect()` returns error.
+
+### LoadUsingReflect() accepts only pointer to your configuration model
+
+The root model must be added to the `LoadUsingReflect()` signature via pointer:
 
 ```go
 err := LoadUsingReflect(&EnvironmentSettings)
