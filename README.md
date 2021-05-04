@@ -78,6 +78,26 @@ type Model1 struct {
 }
 ```
 
+The nested structs added via pointer must be necessarily created:
+
+```go
+var settings Model1
+err := LoadUsingReflect(&settings)
+if err != nil {
+    return err
+}
+```
+
+Nonetheless, if you want, you can do it.
+
+```go
+var settings = Model1{Model2: new(Model2)}
+err := LoadUsingReflect(&settings)
+if err != nil {
+    return err
+}
+```
+
 <a name="limits"></a>
 
 ## 3. Limitations
