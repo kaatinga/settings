@@ -28,15 +28,15 @@ func LoadUsingReflect(settings interface{}) error {
 	for i := 0; i < engine.NumberOfFields; i++ {
 		engine.startIteration(i)
 
-		//fmt.Println(engine.Loop.field.Name, "has toml tag:", engine.Loop.hasTomlTag)
+		//fmt.Println(engine.Field.field.Name, "has toml tag:", engine.Field.hasTomlTag)
 
-		if engine.Loop.fieldValue.Kind() == reflect.Ptr ||
-			engine.Loop.fieldValue.Kind() == reflect.Struct {
+		if engine.Field.value.Kind() == reflect.Ptr ||
+			engine.Field.value.Kind() == reflect.Struct {
 			// we check whether the struct pointer or struct
 
 			err = LoadUsingReflect(&Engine{
-				Value: engine.Loop.fieldValue,
-				Type:  engine.Loop.fieldValue.Type(),
+				Value: engine.Field.value,
+				Type:  engine.Field.value.Type(),
 			})
 			if err != nil {
 				return err
@@ -46,13 +46,18 @@ func LoadUsingReflect(settings interface{}) error {
 		} else {
 
 			// if a field has no env tag, we pass such a field
-			if !engine.Loop.hasEnvTag {
+			if !engine.Field.hasEnvTag {
 				continue
 			}
 
+			engine.prevalidate()
+
 			// if a field has env tag, but the env was not found, we pass such a field
-			engine.Loop.envValue, ok = os.LookupEnv(engine.Loop.envTag)
+			engine.Field.envValue, ok = os.LookupEnv(engine.Field.envTag)
 			if !ok {
+				if engine.Field.required {
+					return engine.validationFailed()
+				}
 				continue
 			}
 
@@ -67,77 +72,77 @@ func LoadUsingReflect(settings interface{}) error {
 
 			//fmt.Println(engine.Value.Field(i).Type().String(), "can be changed")
 
-			switch engine.Loop.fieldValue.Kind() {
+			switch engine.Field.value.Kind() {
 			case reflect.String:
-				engine.Loop.fieldValue.SetString(engine.Loop.envValue)
+				engine.Field.value.SetString(engine.Field.envValue)
 			case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uint:
 
-				if engine.Loop.fieldValue.Kind() == reflect.Uint32 &&
-					engine.Loop.fieldValue.Type().String() == logLevel {
+				if engine.Field.value.Kind() == reflect.Uint32 &&
+					engine.Field.value.Type().String() == logLevel {
 					// check if it is logrus.level
 
 					var level logrus.Level
-					level, err = logrus.ParseLevel(engine.Loop.envValue)
+					level, err = logrus.ParseLevel(engine.Field.envValue)
 					if err != nil {
-						return incorrectFieldValue(engine.Loop.envTag)
+						return incorrectFieldValue(engine.Field.envTag)
 					}
-					engine.Loop.uint64Value = uint64(level)
+					engine.Field.uint64Value = uint64(level)
 
 				} else {
 					// uint
 
-					engine.Loop.uint64Value, err = strconv.ParseUint(engine.Loop.envValue, 10, 64)
+					engine.Field.uint64Value, err = strconv.ParseUint(engine.Field.envValue, 10, 64)
 					if err != nil {
-						return incorrectFieldValue(engine.Loop.envTag)
+						return incorrectFieldValue(engine.Field.envTag)
 					}
 
 					// check if whether the value exceeds the type maximum or not
-					if engine.Loop.uint64Value > maximum(engine.Loop.fieldValue.Kind()) {
-						return incorrectFieldValue(engine.Loop.envTag)
+					if engine.Field.uint64Value > maximum(engine.Field.value.Kind()) {
+						return incorrectFieldValue(engine.Field.envTag)
 					}
 				}
 
-				engine.Loop.fieldValue.SetUint(engine.Loop.uint64Value)
+				engine.Field.value.SetUint(engine.Field.uint64Value)
 
 			case reflect.Int64, reflect.Int:
 
-				if engine.Loop.fieldValue.Kind() == reflect.Int &&
-					engine.Loop.fieldValue.Type().String() == syslogPriority {
+				if engine.Field.value.Kind() == reflect.Int &&
+					engine.Field.value.Type().String() == syslogPriority {
 					// check if it is syslog.Priority
 
 					var priority syslog.Priority
-					priority, err = ParseSyslogPriority(engine.Loop.envValue)
+					priority, err = ParseSyslogPriority(engine.Field.envValue)
 					if err != nil {
-						return incorrectFieldValue(engine.Loop.envTag)
+						return incorrectFieldValue(engine.Field.envTag)
 					}
 
-					engine.Loop.int64Value = int64(priority)
+					engine.Field.int64Value = int64(priority)
 
-				} else if engine.Loop.fieldValue.Kind() == reflect.Int64 &&
-					engine.Loop.fieldValue.Type().String() == duration {
+				} else if engine.Field.value.Kind() == reflect.Int64 &&
+					engine.Field.value.Type().String() == duration {
 					// check if it is time.Duration
 
-					engine.Loop.durationValue, err = time.ParseDuration(engine.Loop.envValue)
+					engine.Field.durationValue, err = time.ParseDuration(engine.Field.envValue)
 					if err != nil {
 						return err
 					}
-					engine.Loop.int64Value = engine.Loop.durationValue.Nanoseconds()
+					engine.Field.int64Value = engine.Field.durationValue.Nanoseconds()
 
 				} else {
 					// int
 
-					engine.Loop.int64Value, err = strconv.ParseInt(engine.Loop.envValue, 10, 64)
+					engine.Field.int64Value, err = strconv.ParseInt(engine.Field.envValue, 10, 64)
 					if err != nil {
 						return err
 					}
 				}
 
-				engine.Loop.fieldValue.SetInt(engine.Loop.int64Value)
+				engine.Field.value.SetInt(engine.Field.int64Value)
 
 			case reflect.Bool:
-				engine.Loop.fieldValue.SetBool(strings.ToLower(engine.Loop.envValue) == "true")
+				engine.Field.value.SetBool(strings.ToLower(engine.Field.envValue) == "true")
 			default:
-				return unsupportedField(engine.Loop.fieldValue.Type().Name())
+				return unsupportedField(engine.Field.value.Type().Name())
 			}
 
 			err = engine.validate()
