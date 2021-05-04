@@ -63,7 +63,7 @@ if err != nil {
 
 ### Nested structs
 
-The nested structs can be added via pointer or without pointer. Example:
+Nested structs can be added via pointer or without pointer. Example:
 
 ```go
 type Model2 struct {
@@ -81,7 +81,7 @@ type Model1 struct {
 }
 ```
 
-Nested structs added via pointer must not be necessarily created:
+The nested structs that added via pointer must not be necessarily initialized:
 
 ```go
 var settings Model1
@@ -113,7 +113,7 @@ If you add an empty struct to your configuration model, `LoadUsingReflect()` ret
 
 ### LoadUsingReflect() accepts only pointer to your configuration model
 
-The root model must be added to the `LoadUsingReflect()` signature via pointer:
+The root model must be initialized and added to the `LoadUsingReflect()` signature via pointer:
 
 ```go
 err := LoadUsingReflect(&EnvironmentSettings)
