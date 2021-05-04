@@ -1,4 +1,4 @@
-[![lint workflow](https://github.com/kaatinga/env_loader/actions/workflows/lint.yml/badge.svg)](https://github.com/kaatinga/env_loader/actions?query=workflow%3Agolangci-lint)
+[![lint workflow](https://github.com/kaatinga/env_loader/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/kaatinga/env_loader/actions?query=workflow%3Agolangci-lint)
 
 # env_loader
 
