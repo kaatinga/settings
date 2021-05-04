@@ -30,7 +30,6 @@ type Loop struct {
 	envTag          string
 	envValue        string
 	validationRule  string
-	tmpStringValue  string
 	durationValue   time.Duration
 	int64Value      int64
 	uint64Value     uint64
