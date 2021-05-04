@@ -22,7 +22,7 @@ type InternalStruct struct {
 
 // test structure #1
 type goodEnvironmentSettings1 struct {
-	Port           string `env:"PORT"`
+	Port           string `env:"PORT" validate:"required"`
 	PathToDatabase string `env:"DB"`
 }
 
@@ -104,13 +104,8 @@ func TestLoadUsingReflect(t *testing.T) {
 	var badSettings5 badEnvironmentSettings1PlusValidation
 	var badSettings6 badEnvironmentSettings2PlusValidation
 	var notAStruct NotAStruct
-	var complex1 = &settingsWithStruct{
-		Port:           "",
-		PathToDatabase: "",
-		Internal:       new(InternalStruct),
-	}
-
-	var validation error
+	var complex1 = settingsWithStruct{}
+	var complex2 = &complex1
 
 	tests := []struct {
 		name     string
@@ -124,23 +119,29 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"!ok3", &badSettings3, ErrIncorrectFieldValue},
 		{"!ok4", &badSettings4, ErrIncorrectFieldValue},
 		{"ok3", &goodSettings5, nil},
-		{"!ok5", &badSettings5, validation},
-		{"!ok6", &badSettings6, validation},
+		{"!ok5", &badSettings5, ErrValidationFailed},
+		{"!ok6", &badSettings6, ErrValidationFailed},
 		{"!ok7", notAStruct, ErrNotAStruct},
 		{"!ok8", &notAStruct, ErrNotAStruct},
-		{"complex1", &complex1, nil},
+		{"complex double pointer", &complex2, nil},
+		{"complex pointer", &complex1, nil},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err = LoadUsingReflect(tt.settings)
-			if !(errors.Is(err, tt.wantErr) || tt.wantErr == validation) {
-				t.Errorf("LoadUsingReflect() error is incorrect\nhave %v\nwant %v", err, tt.wantErr)
-			}
-		})
 
-		if err == nil {
 			spew.Dump(tt.settings)
-		}
+
+			if err == nil {
+				t.Log(err)
+			}
+
+			if errors.Is(err, tt.wantErr) {
+				return
+			}
+
+			t.Errorf("LoadUsingReflect() error is incorrect\nhave %v\nwant %v", err, tt.wantErr)
+		})
 	}
 }
