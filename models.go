@@ -3,6 +3,7 @@ package env_loader
 import (
 	"github.com/go-playground/validator/v10"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -12,7 +13,7 @@ type Engine struct {
 	Type           reflect.Type
 	NumberOfFields int
 	Validate       *validator.Validate
-	Loop           Loop
+	Field          Loop
 }
 
 // newEngine creates new model to process settings.
@@ -34,9 +35,10 @@ type Loop struct {
 	int64Value      int64
 	uint64Value     uint64
 	field           reflect.StructField
-	fieldValue      reflect.Value
+	value           reflect.Value
 	hasEnvTag       bool
 	mustBeValidated bool
+	required        bool
 }
 
 // getStruct checks and returns a struct to process.
@@ -85,19 +87,28 @@ func (engine *Engine) getStruct() error {
 // validationFailed forms validation error.
 func (engine *Engine) validationFailed() error {
 	return &validationFailed{
-		Name:           engine.Loop.field.Name,
-		Type:           engine.Loop.fieldValue.Type().String(),
-		ValidationRule: engine.Loop.validationRule,
+		Name:           engine.Field.field.Name,
+		Type:           engine.Field.value.Type().String(),
+		ValidationRule: engine.Field.validationRule,
+	}
+}
+
+func (engine *Engine) prevalidate() {
+
+	// receiving the 'validate' tag value
+	engine.Field.validationRule, engine.Field.mustBeValidated = engine.Field.field.Tag.Lookup("validate")
+
+	// process validation rule to ascertain the required status
+	if strings.Contains(engine.Field.validationRule, required) {
+		engine.Field.required = true
 	}
 }
 
 // validate validates the current value using `validate` tag.
 func (engine *Engine) validate() error {
 
-	// получаем значение тега 'validate' для поля
-	engine.Loop.validationRule, engine.Loop.mustBeValidated = engine.Loop.field.Tag.Lookup("validate")
-	if engine.Loop.mustBeValidated {
-		err := engine.Validate.Var(engine.Loop.fieldValue.Interface(), engine.Loop.validationRule)
+	if engine.Field.mustBeValidated {
+		err := engine.Validate.Var(engine.Field.value.Interface(), engine.Field.validationRule)
 		if err != nil {
 			//fmt.Println(err)
 			return engine.validationFailed()
@@ -109,10 +120,10 @@ func (engine *Engine) validate() error {
 
 // startIteration launches field processing.
 func (engine *Engine) startIteration(i int) {
-	engine.Loop.field = engine.Type.Field(i)
-	engine.Loop.fieldValue = engine.Value.FieldByName(engine.Loop.field.Name)
+	engine.Field.field = engine.Type.Field(i)
+	engine.Field.value = engine.Value.FieldByName(engine.Field.field.Name)
 
 	// receiving env tag
-	engine.Loop.envTag, engine.Loop.hasEnvTag = engine.Loop.field.Tag.Lookup(env)
-	//fmt.Println(engine.Loop.envTag, engine.Loop.hasEnvTag)
+	engine.Field.envTag, engine.Field.hasEnvTag = engine.Field.field.Tag.Lookup(env)
+	//fmt.Println(engine.Field.envTag, engine.Field.hasEnvTag)
 }
