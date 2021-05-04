@@ -2,6 +2,7 @@ package env_loader
 
 import (
 	"log/syslog"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -31,7 +32,7 @@ func LoadUsingReflect(settings interface{}) error {
 
 		if engine.Loop.fieldValue.Kind() == reflect.Ptr ||
 			engine.Loop.fieldValue.Kind() == reflect.Struct {
-			// Мы проверяем а не вложенная ли это структура
+			// we check whether the struct pointer or struct
 
 			err = LoadUsingReflect(&Engine{
 				Value: engine.Loop.fieldValue,
@@ -46,6 +47,12 @@ func LoadUsingReflect(settings interface{}) error {
 
 			// if a field has no env tag, we pass such a field
 			if !engine.Loop.hasEnvTag {
+				continue
+			}
+
+			// if a field has env tag, but the env was not found, we pass such a field
+			engine.Loop.envValue, ok = os.LookupEnv(engine.Loop.envTag)
+			if !ok {
 				continue
 			}
 
@@ -132,8 +139,6 @@ func LoadUsingReflect(settings interface{}) error {
 			default:
 				return unsupportedField(engine.Loop.fieldValue.Type().Name())
 			}
-
-			//fmt.Println("установленное значение :", fieldValue.Interface())
 
 			err = engine.validate()
 			if err != nil {
