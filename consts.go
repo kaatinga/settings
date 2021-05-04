@@ -12,4 +12,7 @@ const (
 
 	// syslogPriority — type syslog.Priority
 	syslogPriority = "syslog.Priority"
+
+	// required — the string that indicates that the field is required
+	required = "required"
 )
