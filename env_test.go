@@ -16,6 +16,17 @@ type settingsWithStruct struct {
 	Internal       *InternalStruct
 }
 
+// complex example
+type settingsWithStruct2 struct {
+	Port           string `env:"PORT"`
+	PathToDatabase string `env:"DB"`
+	Internal       InternalStruct
+}
+
+type settingsWithRequiredTag struct {
+	PathToDatabase string `env:"DB2" validate:"required"`
+}
+
 type InternalStruct struct {
 	CacheSize string `env:"CACHE"`
 }
@@ -106,6 +117,8 @@ func TestLoadUsingReflect(t *testing.T) {
 	var notAStruct NotAStruct
 	var complex1 = settingsWithStruct{}
 	var complex2 = &complex1
+	var complex3 = settingsWithStruct2{}
+	var requiredField = settingsWithRequiredTag{}
 
 	tests := []struct {
 		name     string
@@ -125,6 +138,8 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"!ok8", &notAStruct, ErrNotAStruct},
 		{"complex double pointer", &complex2, nil},
 		{"complex pointer", &complex1, nil},
+		{"complex with a struct without pointer", &complex3, nil},
+		{"complex with required tag", &requiredField, ErrValidationFailed},
 	}
 
 	for _, tt := range tests {
@@ -133,11 +148,10 @@ func TestLoadUsingReflect(t *testing.T) {
 
 			spew.Dump(tt.settings)
 
-			if err == nil {
-				t.Log(err)
-			}
-
 			if errors.Is(err, tt.wantErr) {
+				if err != nil {
+					t.Log(err)
+				}
 				return
 			}
 
