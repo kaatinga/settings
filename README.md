@@ -1,3 +1,5 @@
+[![lint workflow](https://github.com/kaatinga/env_loader/actions/workflows/lint.yml/badge.svg)](https://github.com/kaatinga/env_loader/actions?query=workflow%3Agolangci-lint)
+
 # env_loader
 
 The package looks up necessary environment variables and use them to set settings for application.
