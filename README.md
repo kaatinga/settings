@@ -1,6 +1,6 @@
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/kaatinga/env_loader/blob/main/LICENSE)
 [![lint workflow](https://github.com/kaatinga/env_loader/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/kaatinga/env_loader/actions?query=workflow%3Agolangci-lint)
-[![GitHub issues by-label](https://img.shields.io/github/issues/nunit/nunit/help%20wanted.svg)](https://github.com/kaatinga/env_loader/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22)
+[![Generic badge](https://img.shields.io/badge/Help%20wanted-True-yellow.svg)](https://github.com/kaatinga/env_loader/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22)
 
 # env_loader
 
