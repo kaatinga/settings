@@ -21,7 +21,7 @@ func (err unsupportedField) Error() string {
 }
 
 func (err unsupportedField) Is(target error) bool {
-	return target == ErrUnsupportedField //nolint:errcheck
+	return target == ErrUnsupportedField //nolint:errorlint
 }
 
 type incorrectFieldValue string
@@ -31,7 +31,7 @@ func (err incorrectFieldValue) Error() string {
 }
 
 func (err incorrectFieldValue) Is(target error) bool {
-	return target == ErrIncorrectFieldValue //nolint:errcheck
+	return target == ErrIncorrectFieldValue //nolint:errorlint
 }
 
 type validationFailed struct {
@@ -45,7 +45,7 @@ func (err *validationFailed) Error() string {
 }
 
 func (err *validationFailed) Is(target error) bool {
-	return target == ErrValidationFailed //nolint:errcheck
+	return target == ErrValidationFailed //nolint:errorlint
 }
 
 // incorrectPriority — error for ParseSyslogPriority()
@@ -56,5 +56,5 @@ func (err incorrectPriority) Error() string {
 }
 
 func (err incorrectPriority) Is(target error) bool {
-	return target == ErrIncorrectPriority //nolint:errcheck
+	return target == ErrIncorrectPriority //nolint:errorlint
 }
