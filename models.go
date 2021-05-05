@@ -106,10 +106,9 @@ func (engine *Engine) prevalidate() {
 // validate validates the current value using `validate` tag.
 func (engine *Engine) validate() error {
 
-	if engine.Field.mustBeValidated {
-		if engine.Validate.Var(engine.Field.value.Interface(), engine.Field.validationRule) != nil {
-			return engine.validationFailed()
-		}
+	if engine.Field.mustBeValidated &&
+		engine.Validate.Var(engine.Field.value.Interface(), engine.Field.validationRule) != nil {
+		return engine.validationFailed()
 	}
 
 	return nil
