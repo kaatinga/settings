@@ -94,12 +94,12 @@ func TestLoadUsingReflect(t *testing.T) {
 
 	// ENV settings PORT=80;DB=db/file;CACHE=5;BADCACHE1=i;BADCACHE2=300
 	var err error
-	err = os.Setenv("PORT", "80")
-	err = os.Setenv("DB", "db/file")
-	err = os.Setenv("CACHE", "5")
-	err = os.Setenv("BADCACHE1", "i")
-	err = os.Setenv("BADCACHE2", "300")
-	err = os.Setenv("BADCACHE3", "-1")
+	err = os.Setenv("PORT", "80") // nolint
+	err = os.Setenv("DB", "db/file") // nolint
+	err = os.Setenv("CACHE", "5") // nolint
+	err = os.Setenv("BADCACHE1", "i") // nolint
+	err = os.Setenv("BADCACHE2", "300") // nolint
+	err = os.Setenv("BADCACHE3", "-1") // nolint
 	err = os.Setenv("BADPORT", "a")
 	if err != nil {
 		t.Errorf("ENV variables has not been set")
