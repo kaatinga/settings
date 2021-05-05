@@ -107,9 +107,7 @@ func (engine *Engine) prevalidate() {
 func (engine *Engine) validate() error {
 
 	if engine.Field.mustBeValidated {
-		err := engine.Validate.Var(engine.Field.value.Interface(), engine.Field.validationRule)
-		if err != nil {
-			//fmt.Println(err)
+		if engine.Validate.Var(engine.Field.value.Interface(), engine.Field.validationRule) != nil {
 			return engine.validationFailed()
 		}
 	}
