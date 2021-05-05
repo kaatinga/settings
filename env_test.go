@@ -142,7 +142,8 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"complex with required tag", &requiredField, ErrValidationFailed},
 	}
 
-	for _, tt := range tests { //nolint
+	//nolint
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err = LoadUsingReflect(tt.settings)
 
