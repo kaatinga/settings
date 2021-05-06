@@ -3,6 +3,7 @@ package env_loader
 import (
 	"errors"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/go-playground/validator/v10"
 	"os"
 	"testing"
 )
@@ -137,13 +138,16 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"!ok7", notAStruct, ErrNotAStruct},
 		{"!ok8", &notAStruct, ErrNotAStruct},
 		{"complex double pointer", &complex2, nil},
-		{"complex pointer", &complex1, nil},
+		{"complex with pointer", &complex1, nil},
 		{"complex with a struct without pointer", &complex3, nil},
 		{"complex with required tag", &requiredField, ErrValidationFailed},
 	}
 
 	//nolint
 	for _, tt := range tests {
+
+		v:=validator.New()
+
 		t.Run(tt.name, func(t *testing.T) {
 			err = LoadUsingReflect(tt.settings)
 
@@ -153,6 +157,12 @@ func TestLoadUsingReflect(t *testing.T) {
 				if err != nil {
 					t.Log(err)
 				}
+
+				err = v.Struct(tt.settings)
+				if err != nil {
+					t.Logf("additional validation result: %s", err)
+				}
+
 				return
 			}
 
