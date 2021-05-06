@@ -1,8 +1,6 @@
-name: golangci-lint
+name: linter
 on:
   push:
-    tags:
-      - v*
     branches:
       - main
   pull_request:
