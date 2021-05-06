@@ -151,11 +151,6 @@ func LoadUsingReflect(settings interface{}) error {
 			}
 		}
 	}
-
-	err = engine.Validate.Struct(settings)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
