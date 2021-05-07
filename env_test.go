@@ -17,11 +17,12 @@ type settings4 struct {
 	Port     uint16        `env:"PORT"`
 	LogLevel logrus.Level  `env:"LOG_LEVEL"`
 	Timeout  time.Duration `env:"TIMEOUT"`
+	Stdout   bool          `env:"STDOUT"`
 }
 
 // settings with unsupported int8
 type badInt8 struct {
-	Port     int8        `env:"PORT"`
+	Port int8 `env:"PORT"`
 }
 
 type NotAStruct string
@@ -40,7 +41,7 @@ type settingsWithStruct struct {
 
 // complex example
 type settingsWithStruct2 struct {
-	Port           int64 `env:"PORT"`
+	Port           int64  `env:"PORT"`
 	PathToDatabase string `env:"DB"`
 	Internal       InternalStruct
 }
@@ -81,7 +82,7 @@ type badEnvironmentSettings2 struct {
 
 // test structure #5
 type badEnvironmentSettings3 struct {
-	Port           int64 `env:"PORT"`
+	Port           int64  `env:"PORT"`
 	PathToDatabase string `env:"DB"`
 	CacheSize      byte   `env:"BADCACHE2"`
 }
@@ -126,6 +127,7 @@ func TestLoadUsingReflect(t *testing.T) {
 	err = os.Setenv("SYSLOG_LEVEL", "info") // nolint
 	err = os.Setenv("TIMEOUT", "20s")       // nolint
 	err = os.Setenv("BADPORT", "a")
+	err = os.Setenv("STDOUT", "true")
 	if err != nil {
 		t.Errorf("ENV variables has not been set")
 	}
