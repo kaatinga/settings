@@ -40,7 +40,7 @@ type settingsWithStruct struct {
 
 // complex example
 type settingsWithStruct2 struct {
-	Port           string `env:"PORT"`
+	Port           int64 `env:"PORT"`
 	PathToDatabase string `env:"DB"`
 	Internal       InternalStruct
 }
@@ -67,21 +67,21 @@ type goodEnvironmentSettings3withEmptyString struct {
 
 // test structure #3
 type goodEnvironmentSettings2 struct {
-	Port           string `env:"PORT"`
+	Port           uint32 `env:"PORT"`
 	PathToDatabase string `env:"DB"`
 	CacheSize      byte   `env:"CACHE"`
 }
 
 // test structure #4
 type badEnvironmentSettings2 struct {
-	Port           string `env:"PORT"`
+	Port           uint32 `env:"PORT"`
 	PathToDatabase string `env:"DB"`
 	CacheSize      byte   `env:"BADCACHE1"`
 }
 
 // test structure #5
 type badEnvironmentSettings3 struct {
-	Port           string `env:"PORT"`
+	Port           int64 `env:"PORT"`
 	PathToDatabase string `env:"DB"`
 	CacheSize      byte   `env:"BADCACHE2"`
 }
@@ -132,7 +132,7 @@ func TestLoadUsingReflect(t *testing.T) {
 
 	var goodSettings1 goodEnvironmentSettings1
 	var goodSettings3withEmptyString goodEnvironmentSettings3withEmptyString
-	var withoutPointer goodEnvironmentSettings2
+	var good2 goodEnvironmentSettings2
 	var badSettings2 badEnvironmentSettings2
 	var badSettings3 badEnvironmentSettings3
 	var badSettings4 badEnvironmentSettings4
@@ -155,11 +155,12 @@ func TestLoadUsingReflect(t *testing.T) {
 	}{
 		{"ok1", &goodSettings1, nil},
 		{"ok2", &goodSettings3withEmptyString, nil},
-		{"!ok1", withoutPointer, ErrNotAddressable},
+		{"!ok1", good2, ErrNotAddressable},
+		{"ok3", &good2, nil},
 		{"!ok2", &badSettings2, ErrIncorrectFieldValue},
 		{"!ok3", &badSettings3, ErrIncorrectFieldValue},
 		{"!ok4", &badSettings4, ErrIncorrectFieldValue},
-		{"ok3", &goodSettings5, nil},
+		{"ok4", &goodSettings5, nil},
 		{"!ok5", &badSettings5, ErrValidationFailed},
 		{"!ok6", &badSettings6, ErrValidationFailed},
 		{"!ok7", notAStruct, ErrNotAStruct},
