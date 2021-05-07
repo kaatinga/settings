@@ -3,10 +3,10 @@ package env_loader
 import cer "github.com/kaatinga/const-errs"
 
 const (
-	ErrUnsupportedField    cer.Error = "unsupported field type"
-	ErrTheModelHasNoFields cer.Error = "the input structure has no fields"
-	ErrNotAStruct          cer.Error = "the configuration must be a struct"
-	ErrNotAddressable      cer.Error = "the main struct must be pointed out via pointer"
+	ErrUnsupportedField       cer.Error = "unsupported field type"
+	ErrTheModelHasEmptyStruct cer.Error = "an input struct has no fields"
+	ErrNotAStruct             cer.Error = "the configuration must be a struct"
+	ErrNotAddressable         cer.Error = "the main struct must be pointed out via pointer"
 
 	ErrInternalFailure     cer.Error = "an internal package error"
 	ErrIncorrectFieldValue cer.Error = "variable has been found but has incorrect value"

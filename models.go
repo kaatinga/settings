@@ -77,7 +77,7 @@ func (engine *Engine) getStruct() error {
 	// checking the number of the fields in the struct.
 	engine.NumberOfFields = engine.Type.NumField()
 	if engine.NumberOfFields == 0 {
-		return ErrTheModelHasNoFields
+		return ErrTheModelHasEmptyStruct
 	}
 
 	return nil
