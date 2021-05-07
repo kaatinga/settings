@@ -17,7 +17,7 @@ const (
 type unsupportedField string
 
 func (err unsupportedField) Error() string {
-	return "environment variable " + string(err) + " has been found but has incorrect value"
+	return "environment variable " + string(err) + " has been found but the field type is unsupported"
 }
 
 func (err unsupportedField) Is(target error) bool {
