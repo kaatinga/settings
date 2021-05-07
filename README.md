@@ -1,6 +1,6 @@
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/kaatinga/env_loader/blob/main/LICENSE)
 [![codecov](https://codecov.io/gh/kaatinga/env_loader/branch/main/graph/badge.svg)](https://codecov.io/gh/kaatinga/env_loader)
-[![lint workflow](https://github.com/kaatinga/env_loader/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/kaatinga/env_loader/actions?query=workflow%3Agolangci-lint)
+[![lint workflow](https://github.com/kaatinga/env_loader/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/kaatinga/env_loader/actions?query=workflow%3Alinter)
 [![Generic badge](https://img.shields.io/badge/Help%20wanted-True-yellow.svg)](https://github.com/kaatinga/env_loader/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22)
 
 # env_loader
