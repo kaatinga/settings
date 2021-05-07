@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
 )
 
@@ -78,7 +79,7 @@ func LoadUsingReflect(settings interface{}) error {
 			case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uint:
 
 				if engine.Field.value.Kind() == reflect.Uint32 &&
-					engine.Field.value.Type().String() == logLevel {
+					engine.Field.value.Type().String() == logrusLevel {
 					// check if it is logrus.level
 
 					var level logrus.Level
@@ -103,6 +104,23 @@ func LoadUsingReflect(settings interface{}) error {
 				}
 
 				engine.Field.value.SetUint(engine.Field.uint64Value)
+
+			case reflect.Int8:
+
+				if engine.Field.value.Type().String() == zerologLevel {
+					// check if it is zerolog.Level
+
+					var level zerolog.Level
+					level, err = zerolog.ParseLevel(engine.Field.envValue)
+					if err != nil {
+						return incorrectFieldValue(engine.Field.envTag)
+					}
+
+					engine.Field.value.SetInt(int64(level))
+					break
+				}
+
+				return unsupportedField(engine.Field.value.Type().Name())
 
 			case reflect.Int64, reflect.Int:
 
