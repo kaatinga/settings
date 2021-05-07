@@ -4,11 +4,18 @@ import (
 	"errors"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/validator/v10"
+	"github.com/rs/zerolog"
+	"log/syslog"
 	"os"
 	"testing"
 )
 
 type NotAStruct string
+
+type settingsWithZerologSyslog struct {
+	LogLevel zerolog.Level `env:"LOG_LEVEL"`
+	SyslogPriority syslog.Priority `env:"SYSLOG_LEVEL"`
+}
 
 // complex example
 type settingsWithStruct struct {
@@ -101,6 +108,8 @@ func TestLoadUsingReflect(t *testing.T) {
 	err = os.Setenv("BADCACHE1", "i") // nolint
 	err = os.Setenv("BADCACHE2", "300") // nolint
 	err = os.Setenv("BADCACHE3", "-1") // nolint
+	err = os.Setenv("LOG_LEVEL", "debug") // nolint
+	err = os.Setenv("SYSLOG_LEVEL", "info") // nolint
 	err = os.Setenv("BADPORT", "a")
 	if err != nil {
 		t.Errorf("ENV variables has not been set")
@@ -120,6 +129,7 @@ func TestLoadUsingReflect(t *testing.T) {
 	var complex2 = &complex1
 	var complex3 = settingsWithStruct2{}
 	var requiredField = settingsWithRequiredTag{}
+	var zerologSyslog = settingsWithZerologSyslog{}
 
 	tests := []struct {
 		name     string
@@ -141,6 +151,7 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"complex with pointer", &complex1, nil},
 		{"complex with a struct without pointer", &complex3, nil},
 		{"complex with required tag", &requiredField, ErrValidationFailed},
+		{"zerolog and syslog fields", &zerologSyslog, nil},
 	}
 
 	//nolint
