@@ -31,7 +31,7 @@ jobs:
       - name: Test
         run: go test .
 
-  build:
+  codecov:
     needs: [tests]
     runs-on: ubuntu-latest
     steps:
