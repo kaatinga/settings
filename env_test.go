@@ -12,6 +12,12 @@ import (
 	"time"
 )
 
+type emptySettings struct{}
+
+type badInt16 struct {
+	PORT int16 `env:"PORT"`
+}
+
 // settings with logrus.Level and time.Duration 4
 type settings4 struct {
 	Port     uint16        `env:"PORT"`
@@ -148,7 +154,6 @@ func TestLoadUsingReflect(t *testing.T) {
 	var requiredField = settingsWithRequiredTag{}
 	var zerologSyslog = settingsWithZerologSyslog{}
 	var logrusDurationUint16 = settings4{}
-	var unsupportedInt8 = badInt8{}
 
 	tests := []struct {
 		name     string
@@ -173,7 +178,9 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"complex with required tag", &requiredField, ErrValidationFailed},
 		{"zerolog and syslog fields", &zerologSyslog, nil},
 		{"logrus and duration", &logrusDurationUint16, nil},
-		{"int8", &unsupportedInt8, ErrUnsupportedField},
+		{"int8", &badInt8{}, ErrUnsupportedField},
+		{"int8", &badInt16{}, ErrUnsupportedField},
+		{"int8", &emptySettings{}, ErrTheModelHasEmptyStruct},
 	}
 
 	//nolint
