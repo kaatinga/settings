@@ -12,11 +12,16 @@ import (
 	"time"
 )
 
-// complex example 4
+// settings with logrus.Level and time.Duration 4
 type settings4 struct {
 	Port     uint16        `env:"PORT"`
 	LogLevel logrus.Level  `env:"LOG_LEVEL"`
 	Timeout  time.Duration `env:"TIMEOUT"`
+}
+
+// settings with unsupported int8
+type badInt8 struct {
+	Port     int8        `env:"PORT"`
 }
 
 type NotAStruct string
@@ -141,6 +146,7 @@ func TestLoadUsingReflect(t *testing.T) {
 	var requiredField = settingsWithRequiredTag{}
 	var zerologSyslog = settingsWithZerologSyslog{}
 	var logrusDurationUint16 = settings4{}
+	var unsupportedInt8 = badInt8{}
 
 	tests := []struct {
 		name     string
@@ -164,6 +170,7 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"complex with required tag", &requiredField, ErrValidationFailed},
 		{"zerolog and syslog fields", &zerologSyslog, nil},
 		{"logrus and duration", &logrusDurationUint16, nil},
+		{"int8", &unsupportedInt8, ErrUnsupportedField},
 	}
 
 	//nolint
