@@ -126,7 +126,7 @@ func TestLoadUsingReflect(t *testing.T) {
 	err = os.Setenv("LOG_LEVEL", "debug")   // nolint
 	err = os.Setenv("SYSLOG_LEVEL", "info") // nolint
 	err = os.Setenv("TIMEOUT", "20s")       // nolint
-	err = os.Setenv("BADPORT", "a")
+	err = os.Setenv("BADPORT", "a")         // nolint
 	err = os.Setenv("STDOUT", "true")
 	if err != nil {
 		t.Errorf("ENV variables has not been set")
