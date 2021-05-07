@@ -5,15 +5,24 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog"
+	"github.com/sirupsen/logrus"
 	"log/syslog"
 	"os"
 	"testing"
+	"time"
 )
+
+// complex example 4
+type settings4 struct {
+	Port     uint16        `env:"PORT"`
+	LogLevel logrus.Level  `env:"LOG_LEVEL"`
+	Timeout  time.Duration `env:"TIMEOUT"`
+}
 
 type NotAStruct string
 
 type settingsWithZerologSyslog struct {
-	LogLevel zerolog.Level `env:"LOG_LEVEL"`
+	LogLevel       zerolog.Level   `env:"LOG_LEVEL"`
 	SyslogPriority syslog.Priority `env:"SYSLOG_LEVEL"`
 }
 
@@ -102,14 +111,15 @@ func TestLoadUsingReflect(t *testing.T) {
 
 	// ENV settings PORT=80;DB=db/file;CACHE=5;BADCACHE1=i;BADCACHE2=300
 	var err error
-	err = os.Setenv("PORT", "80") // nolint
-	err = os.Setenv("DB", "db/file") // nolint
-	err = os.Setenv("CACHE", "5") // nolint
-	err = os.Setenv("BADCACHE1", "i") // nolint
-	err = os.Setenv("BADCACHE2", "300") // nolint
-	err = os.Setenv("BADCACHE3", "-1") // nolint
-	err = os.Setenv("LOG_LEVEL", "debug") // nolint
+	err = os.Setenv("PORT", "80")           // nolint
+	err = os.Setenv("DB", "db/file")        // nolint
+	err = os.Setenv("CACHE", "5")           // nolint
+	err = os.Setenv("BADCACHE1", "i")       // nolint
+	err = os.Setenv("BADCACHE2", "300")     // nolint
+	err = os.Setenv("BADCACHE3", "-1")      // nolint
+	err = os.Setenv("LOG_LEVEL", "debug")   // nolint
 	err = os.Setenv("SYSLOG_LEVEL", "info") // nolint
+	err = os.Setenv("TIMEOUT", "20s")       // nolint
 	err = os.Setenv("BADPORT", "a")
 	if err != nil {
 		t.Errorf("ENV variables has not been set")
@@ -130,6 +140,7 @@ func TestLoadUsingReflect(t *testing.T) {
 	var complex3 = settingsWithStruct2{}
 	var requiredField = settingsWithRequiredTag{}
 	var zerologSyslog = settingsWithZerologSyslog{}
+	var logrusDurationUint16 = settings4{}
 
 	tests := []struct {
 		name     string
@@ -152,12 +163,13 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"complex with a struct without pointer", &complex3, nil},
 		{"complex with required tag", &requiredField, ErrValidationFailed},
 		{"zerolog and syslog fields", &zerologSyslog, nil},
+		{"logrus and duration", &logrusDurationUint16, nil},
 	}
 
 	//nolint
 	for _, tt := range tests {
 
-		v:=validator.New()
+		v := validator.New()
 
 		t.Run(tt.name, func(t *testing.T) {
 			err = LoadUsingReflect(tt.settings)
