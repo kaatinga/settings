@@ -32,7 +32,7 @@ func LoadUsingReflect(settings interface{}) error {
 
 		if engine.Field.value.Kind() == reflect.Ptr ||
 			engine.Field.value.Kind() == reflect.Struct {
-			// we check whether the struct pointer or struct
+			// we check whether the field is pointer or struct
 
 			err = LoadUsingReflect(&Engine{
 				Value: engine.Field.value,
@@ -50,9 +50,11 @@ func LoadUsingReflect(settings interface{}) error {
 				continue
 			}
 
+			// we check if it is required
 			engine.prevalidate()
 
-			// if a field has env tag, but the env was not found, we pass such a field
+			// if a field has env tag, but the env was not found, and if it is required
+			// we return error
 			engine.Field.envValue, ok = os.LookupEnv(engine.Field.envTag)
 			if !ok {
 				if engine.Field.required {
@@ -69,8 +71,6 @@ func LoadUsingReflect(settings interface{}) error {
 			if !engine.Value.Field(i).CanSet() {
 				return ErrNotAddressable
 			}
-
-			//fmt.Println(engine.Value.Field(i).Type().String(), "can be changed")
 
 			switch engine.Field.value.Kind() {
 			case reflect.String:
