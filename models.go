@@ -99,8 +99,12 @@ func (engine *Engine) validateRequired() {
 	engine.Field.validationRule, engine.Field.mustBeValidated = engine.Field.field.Tag.Lookup("validate")
 
 	// process validation rule to ascertain the required status
-	if strings.Contains(engine.Field.validationRule, required) {
-		engine.Field.required = true
+	rules := strings.Split(engine.Field.validationRule, ",")
+	for _, value := range rules {
+		if value == required {
+			engine.Field.required = true
+			break
+		}
 	}
 }
 

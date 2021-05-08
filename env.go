@@ -51,6 +51,7 @@ func LoadUsingReflect(settings interface{}) error {
 
 			// we check if it is required
 			engine.validateRequired()
+			//fmt.Println(engine.Field.field.Name, "required:", engine.Field.required)
 
 			// if a field has env tag, but the env was not found, and if it is required
 			// we return error
