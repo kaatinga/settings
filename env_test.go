@@ -14,6 +14,11 @@ import (
 
 type emptySettings struct{}
 
+type settingWithRequiredIf struct {
+	RequiredIf string `env:"NOTFOUND" validate:"required_if=Trigger true"`
+	Trigger bool `env:"STDOUT"`
+}
+
 type badInt16 struct {
 	PORT int16 `env:"PORT"`
 }
@@ -153,7 +158,6 @@ func TestLoadUsingReflect(t *testing.T) {
 	var complex3 = settingsWithStruct2{}
 	var requiredField = settingsWithRequiredTag{}
 	var zerologSyslog = settingsWithZerologSyslog{}
-	var logrusDurationUint16 = settings4{}
 
 	tests := []struct {
 		name     string
@@ -177,10 +181,11 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"complex with a struct without pointer", &complex3, nil},
 		{"complex with required tag", &requiredField, ErrValidationFailed},
 		{"zerolog and syslog fields", &zerologSyslog, nil},
-		{"logrus and duration", &logrusDurationUint16, nil},
+		{"logrus and duration", &settings4{}, nil},
 		{"int8", &badInt8{}, ErrUnsupportedField},
-		{"int8", &badInt16{}, ErrUnsupportedField},
-		{"int8", &emptySettings{}, ErrTheModelHasEmptyStruct},
+		{"int16", &badInt16{}, ErrUnsupportedField},
+		{"empty", &emptySettings{}, ErrTheModelHasEmptyStruct},
+		{"required if failed", &settingWithRequiredIf{}, ErrValidationFailed},
 	}
 
 	//nolint
