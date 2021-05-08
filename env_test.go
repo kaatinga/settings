@@ -127,8 +127,7 @@ type badEnvironmentSettings2PlusValidation struct {
 func TestLoadUsingReflect(t *testing.T) {
 
 	// ENV settings PORT=80;DB=db/file;CACHE=5;BADCACHE1=i;BADCACHE2=300
-	var err error
-	err = os.Setenv("PORT", "80")           // nolint
+	err := os.Setenv("PORT", "80")           // nolint
 	err = os.Setenv("DB", "db/file")        // nolint
 	err = os.Setenv("CACHE", "5")           // nolint
 	err = os.Setenv("BADCACHE1", "i")       // nolint
@@ -215,7 +214,6 @@ func TestLoadUsingReflect(t *testing.T) {
 					t.Log(validationError)
 					return
 				}
-
 			}
 
 			t.Errorf("LoadUsingReflect() error is incorrect\nhave %v\nwant %v", err, tt.wantErr)
