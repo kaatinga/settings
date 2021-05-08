@@ -25,8 +25,7 @@ func ParseSyslogPriority(lvl string) (syslog.Priority, error) {
 		return syslog.LOG_NOTICE, nil
 	}
 
-	var p syslog.Priority
-	return p, incorrectPriority(lvl)
+	return 0, incorrectPriority(lvl)
 }
 
 // PriorityDescription returns description for syslog.Priority.
