@@ -131,7 +131,7 @@ func LoadUsingReflect(settings interface{}) error {
 					var priority syslog.Priority
 					priority, err = ParseSyslogPriority(engine.Field.envValue)
 					if err != nil {
-						return incorrectFieldValue(engine.Field.envTag)
+						return err
 					}
 
 					engine.Field.int64Value = int64(priority)
