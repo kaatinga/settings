@@ -93,7 +93,7 @@ func (engine *Engine) validationFailed() error {
 	}
 }
 
-func (engine *Engine) prevalidate() {
+func (engine *Engine) validateRequired() {
 
 	// receiving the 'validate' tag value
 	engine.Field.validationRule, engine.Field.mustBeValidated = engine.Field.field.Tag.Lookup("validate")
@@ -105,15 +105,15 @@ func (engine *Engine) prevalidate() {
 }
 
 // validate validates the current value using `validate` tag.
-func (engine *Engine) validate() error {
-
-	if engine.Field.mustBeValidated &&
-		engine.Validate.Var(engine.Field.value.Interface(), engine.Field.validationRule) != nil {
-		return engine.validationFailed()
-	}
-
-	return nil
-}
+//func (engine *Engine) validate() error {
+//
+//	if engine.Field.mustBeValidated &&
+//		engine.Validate.Var(engine.Field.value.Interface(), engine.Field.validationRule) != nil {
+//		return engine.validationFailed()
+//	}
+//
+//	return nil
+//}
 
 // startIteration launches field processing.
 func (engine *Engine) startIteration(i int) {
