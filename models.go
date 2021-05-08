@@ -36,6 +36,7 @@ type Loop struct {
 	field           reflect.StructField
 	value           reflect.Value
 	hasEnvTag       bool
+	hasEnvValue     bool
 	mustBeValidated bool
 	required        bool
 }
