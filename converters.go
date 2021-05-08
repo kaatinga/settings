@@ -29,7 +29,7 @@ func ParseSyslogPriority(lvl string) (syslog.Priority, error) {
 }
 
 // PriorityDescription returns description for syslog.Priority.
-func PriorityDescription(priority syslog.Priority) string { //nolint:unused
+func PriorityDescription(priority syslog.Priority) string {
 	switch priority {
 	case syslog.LOG_DEBUG:
 		return "debug"
