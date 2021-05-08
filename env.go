@@ -16,8 +16,8 @@ import (
 // via pointer. It supports only byte and string field types.
 func LoadUsingReflect(settings interface{}) error {
 
-	engine, ok := settings.(*Engine)
-	if !ok {
+	engine, nestedStruct := settings.(*Engine)
+	if !nestedStruct {
 		engine = newEngine(settings)
 	}
 
@@ -28,8 +28,6 @@ func LoadUsingReflect(settings interface{}) error {
 
 	for i := 0; i < engine.NumberOfFields; i++ {
 		engine.startIteration(i)
-
-		//fmt.Println(engine.Field.field.Name, "has toml tag:", engine.Field.hasTomlTag)
 
 		if engine.Field.value.Kind() == reflect.Ptr ||
 			engine.Field.value.Kind() == reflect.Struct {
@@ -56,8 +54,8 @@ func LoadUsingReflect(settings interface{}) error {
 
 			// if a field has env tag, but the env was not found, and if it is required
 			// we return error
-			engine.Field.envValue, ok = os.LookupEnv(engine.Field.envTag)
-			if !ok {
+			engine.Field.envValue, engine.Field.hasEnvValue = os.LookupEnv(engine.Field.envTag)
+			if !engine.Field.hasEnvValue {
 				if engine.Field.required {
 					return engine.validationFailed()
 				}
@@ -162,13 +160,14 @@ func LoadUsingReflect(settings interface{}) error {
 			default:
 				return unsupportedField(engine.Field.value.Type().Name())
 			}
-
-			err = engine.validate()
-			if err != nil {
-				return err
-			}
 		}
 	}
+
+	if !nestedStruct {
+		// we execute entire struct validation
+		return engine.Validate.Struct(engine.Value.Interface())
+	}
+
 	return nil
 }
 
