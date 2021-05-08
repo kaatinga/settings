@@ -5,9 +5,8 @@
 
 # env_loader
 
-The package looks up necessary environment variables and use them to set settings for application.
-
-The settings must be formed as struct with byte and string fields.
+The package looks up necessary environment variables and use them to specify settings for your application. In addition, the
+package validates the final struct using standard `validate` tags.
 
 ## Contents
 
@@ -33,8 +32,7 @@ Then import the validator package into your own code.
 
 ### How to use
 
-Create a settings model where you can use tags `env` and `validate`.
-Announce a variable and call `LoadUsingReflect()`:
+Create a settings model where you can use tags `env` and `validate`. Announce a variable and call `LoadUsingReflect()`:
 
 ```go
 type settings struct {
