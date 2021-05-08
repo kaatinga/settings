@@ -204,6 +204,13 @@ func TestLoadUsingReflect(t *testing.T) {
 				}
 
 				return
+			} else if tt.wantErr == ErrValidationFailed {
+				validationError, ok := err.(validator.ValidationErrors)
+				if ok {
+					t.Log(validationError)
+					return
+				}
+
 			}
 
 			t.Errorf("LoadUsingReflect() error is incorrect\nhave %v\nwant %v", err, tt.wantErr)
