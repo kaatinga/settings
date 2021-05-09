@@ -10,8 +10,8 @@ github.com/go-playground/universal-translator v0.17.0 h1:icxd5fm+REJzpZx7ZfpaD87
 github.com/go-playground/universal-translator v0.17.0/go.mod h1:UkSxE5sNxxRwHyU+Scu5vgOQjsIJAF8j9muTVoKLVtA=
 github.com/go-playground/validator/v10 v10.6.0 h1:UGIt4xR++fD9QrBOoo/ascJfGe3AGHEB9s6COnss4Rk=
 github.com/go-playground/validator/v10 v10.6.0/go.mod h1:xm76BBt941f7yWdGnI2DVPFFg1UK3YY04qifoXU3lOk=
-github.com/kaatinga/const-errs v0.0.0-20210422194723-c42ab0222fa8 h1:0efOhUkctm6ARE4v2dD728E0irC0PuLIL/QsVYwGYq8=
-github.com/kaatinga/const-errs v0.0.0-20210422194723-c42ab0222fa8/go.mod h1:v4aBzObpEAb/ha35dIgohIFD8KCRHmPt76v8xu2v2zs=
+github.com/kaatinga/const-errs v1.0.0 h1:SLGCWZcfqXeRowK75riH1uhUEmyxelZ9ZGaxK33Pa3M=
+github.com/kaatinga/const-errs v1.0.0/go.mod h1:v4aBzObpEAb/ha35dIgohIFD8KCRHmPt76v8xu2v2zs=
 github.com/leodido/go-urn v1.2.0/go.mod h1:+8+nEpDfqqsY+g338gtMEUOtuK+4dEMhiQEgxpxOKII=
 github.com/leodido/go-urn v1.2.1 h1:BqpAaACuzVSgi/VLzGZIobT2z4v53pjosyNd9Yv6n/w=
 github.com/leodido/go-urn v1.2.1/go.mod h1:zt4jvISO2HfUBqxjfIshjdMTYS56ZS/qv49ictyFfxY=

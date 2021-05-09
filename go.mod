@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-playground/validator/v10 v10.6.0
-	github.com/kaatinga/const-errs v0.0.0-20210422194723-c42ab0222fa8
+	github.com/kaatinga/const-errs v1.0.0
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/rs/zerolog v1.21.0
 	github.com/sirupsen/logrus v1.8.1
