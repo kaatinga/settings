@@ -4,6 +4,9 @@ const (
 	// env — env tag name
 	env = "env"
 
+	// defaultSetting — default tag name
+	defaultSetting = "default"
+
 	// duration — type time.Duration
 	duration = "time.Duration"
 
