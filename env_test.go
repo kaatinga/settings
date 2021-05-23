@@ -2,21 +2,22 @@ package env_loader
 
 import (
 	"errors"
-	"github.com/davecgh/go-spew/spew"
-	"github.com/go-playground/validator/v10"
-	"github.com/rs/zerolog"
-	"github.com/sirupsen/logrus"
 	"log/syslog"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/davecgh/go-spew/spew"
+	"github.com/go-playground/validator/v10"
+	"github.com/rs/zerolog"
+	"github.com/sirupsen/logrus"
 )
 
 type emptySettings struct{}
 
 type settingWithRequiredIf struct {
 	RequiredIf string `env:"NOTFOUND" validate:"required_if=Trigger true"`
-	Trigger bool `env:"STDOUT"`
+	Trigger    bool   `env:"STDOUT"`
 }
 
 type badInt16 struct {
@@ -124,10 +125,15 @@ type badEnvironmentSettings2PlusValidation struct {
 	CacheSize      byte   `env:"CACHE" validate:"min=10"`
 }
 
+type simpleConfig struct {
+	DBURL   string        `env:"DB_URL"`
+	Timeout time.Duration `env:"DB_Timeout"`
+}
+
 func TestLoadUsingReflect(t *testing.T) {
 
 	// ENV settings PORT=80;DB=db/file;CACHE=5;BADCACHE1=i;BADCACHE2=300
-	err := os.Setenv("PORT", "80")           // nolint
+	err := os.Setenv("PORT", "80")          // nolint
 	err = os.Setenv("DB", "db/file")        // nolint
 	err = os.Setenv("CACHE", "5")           // nolint
 	err = os.Setenv("BADCACHE1", "i")       // nolint
@@ -157,6 +163,7 @@ func TestLoadUsingReflect(t *testing.T) {
 	var complex3 = settingsWithStruct2{}
 	var requiredField = settingsWithRequiredTag{}
 	var zerologSyslog = settingsWithZerologSyslog{}
+	var simple simpleConfig
 
 	tests := []struct {
 		name     string
@@ -185,6 +192,7 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"int16", &badInt16{}, ErrUnsupportedField},
 		{"empty", &emptySettings{}, ErrTheModelHasEmptyStruct},
 		{"required if failed", &settingWithRequiredIf{}, ErrValidationFailed},
+		{"not_set_env", &simple, nil},
 	}
 
 	//nolint
