@@ -33,13 +33,13 @@ Then import the validator package into your own code.
 
 ### How to use
 
-Create a settings model where you can use tags `env` and `validate`. Announce a variable and call `LoadUsingReflect()`:
+Create a settings model where you can use tags `env`, `default` and `validate`. Announce a variable and call `LoadUsingReflect()`:
 
 ```go
 type Settings struct {
     Port       string `env:"PORT" validate:"numeric"`
     Database   string `env:"DATABASE"`
-    CacheSize  byte `env:"CACHE_SIZE"`
+    CacheSize  byte `env:"CACHE_SIZE" default:"50"`
     LaunchMode string `env:"LAUNCH_MODE"`
 }
 
@@ -49,6 +49,10 @@ if err != nil {
     return err
 }
 ```
+
+The `env` tag must contain the name of the related environment variable.
+The `default` tag contains a default value that is used in case the environment variable was not found.
+The `validate` tag may contain an optional validation rule fallowing the documentation of the [validator package](https://github.com/go-playground/validator/). 
 
 ### Supported types
 
