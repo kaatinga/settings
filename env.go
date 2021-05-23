@@ -60,7 +60,13 @@ func LoadUsingReflect(settings interface{}) error {
 				if engine.Field.required {
 					return engine.validationFailed()
 				}
-				continue
+
+				if engine.Field.hasDefaultSetting {
+					engine.Field.hasEnvValue = true
+					engine.Field.envValue = engine.Field.defaultSetting
+				} else {
+					continue
+				}
 			}
 
 			if !engine.Value.Field(i).IsValid() {
