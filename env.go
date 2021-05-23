@@ -62,9 +62,10 @@ func LoadUsingReflect(settings interface{}) error {
 				}
 
 				if engine.Field.hasDefaultSetting {
-					engine.Field.hasEnvValue = true
+					// substitute the envValue with default setting
 					engine.Field.envValue = engine.Field.defaultSetting
 				} else {
+					// finish processing the current field
 					continue
 				}
 			}
