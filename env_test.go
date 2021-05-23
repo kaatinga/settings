@@ -126,27 +126,24 @@ type badEnvironmentSettings2PlusValidation struct {
 }
 
 type simpleConfig struct {
-	DBURL   string        `env:"DB_URL"`
-	Timeout time.Duration `env:"DB_Timeout"`
+	DBURL   string        `env:"DB_URL" default:"127.0.0.1"`
+	Timeout time.Duration `env:"DB_TIMEOUT" default:"5s"`
 }
 
 func TestLoadUsingReflect(t *testing.T) {
 
 	// ENV settings PORT=80;DB=db/file;CACHE=5;BADCACHE1=i;BADCACHE2=300
-	err := os.Setenv("PORT", "80")          // nolint
-	err = os.Setenv("DB", "db/file")        // nolint
-	err = os.Setenv("CACHE", "5")           // nolint
-	err = os.Setenv("BADCACHE1", "i")       // nolint
-	err = os.Setenv("BADCACHE2", "300")     // nolint
-	err = os.Setenv("BADCACHE3", "-1")      // nolint
-	err = os.Setenv("LOG_LEVEL", "debug")   // nolint
-	err = os.Setenv("SYSLOG_LEVEL", "info") // nolint
-	err = os.Setenv("TIMEOUT", "20s")       // nolint
-	err = os.Setenv("BADPORT", "a")         // nolint
-	err = os.Setenv("STDOUT", "true")
-	if err != nil {
-		t.Errorf("ENV variables has not been set")
-	}
+	os.Setenv("PORT", "80")           // nolint
+	os.Setenv("DB", "db/file")        // nolint
+	os.Setenv("CACHE", "5")           // nolint
+	os.Setenv("BADCACHE1", "i")       // nolint
+	os.Setenv("BADCACHE2", "300")     // nolint
+	os.Setenv("BADCACHE3", "-1")      // nolint
+	os.Setenv("LOG_LEVEL", "debug")   // nolint
+	os.Setenv("SYSLOG_LEVEL", "info") // nolint
+	os.Setenv("TIMEOUT", "20s")       // nolint
+	os.Setenv("BADPORT", "a")         // nolint
+	os.Setenv("STDOUT", "true")       // nolint
 
 	var goodSettings1 goodEnvironmentSettings1
 	var goodSettings3withEmptyString goodEnvironmentSettings3withEmptyString
@@ -194,6 +191,8 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"required if failed", &settingWithRequiredIf{}, ErrValidationFailed},
 		{"not_set_env", &simple, nil},
 	}
+
+	var err error
 
 	//nolint
 	for _, tt := range tests {
