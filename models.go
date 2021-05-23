@@ -27,18 +27,20 @@ func newEngine(settings interface{}) *Engine {
 
 // Loop — variables that used during field processing.
 type Loop struct {
-	envTag          string
-	envValue        string
-	validationRule  string
-	durationValue   time.Duration
-	int64Value      int64
-	uint64Value     uint64
-	field           reflect.StructField
-	value           reflect.Value
-	hasEnvTag       bool
-	hasEnvValue     bool
-	mustBeValidated bool
-	required        bool
+	envTag            string
+	envValue          string
+	validationRule    string
+	durationValue     time.Duration
+	int64Value        int64
+	uint64Value       uint64
+	field             reflect.StructField
+	value             reflect.Value
+	hasEnvTag         bool
+	hasEnvValue       bool
+	mustBeValidated   bool
+	required          bool
+	defaultSetting    string
+	hasDefaultSetting bool
 }
 
 // getStruct checks and returns a struct to process.
@@ -126,5 +128,7 @@ func (engine *Engine) startIteration(i int) {
 
 	// receiving env tag
 	engine.Field.envTag, engine.Field.hasEnvTag = engine.Field.field.Tag.Lookup(env)
-	//fmt.Println(engine.Field.envTag, engine.Field.hasEnvTag)
+
+	// receiving default setting
+	engine.Field.defaultSetting, engine.Field.hasDefaultSetting = engine.Field.field.Tag.Lookup(defaultSetting)
 }
