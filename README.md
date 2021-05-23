@@ -36,8 +36,8 @@ Then import the validator package into your own code.
 Create a settings model where you can use tags `env` and `validate`. Announce a variable and call `LoadUsingReflect()`:
 
 ```go
-type settings struct {
-    Port       string `env:"PORT validate:"numeric"`
+type Settings struct {
+    Port       string `env:"PORT" validate:"numeric"`
     Database   string `env:"DATABASE"`
     CacheSize  byte `env:"CACHE_SIZE"`
     LaunchMode string `env:"LAUNCH_MODE"`
