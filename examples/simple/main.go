@@ -20,7 +20,7 @@ func main() {
 		log.Fatalf("set env error, %s", err)
 	}
 	var sett settings
-	err = env.LoadUsingReflect(&sett)
+	err = env.LoadSettings(&sett)
 	if err != nil {
 		log.Fatalf("load error happened, %s", err)
 	}

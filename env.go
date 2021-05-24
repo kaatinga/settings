@@ -12,9 +12,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// LoadUsingReflect loads a struct. The struct must contain tag 'env' on every struct field and must be set
-// via pointer. It supports only byte and string field types.
-func LoadUsingReflect(settings interface{}) error {
+// LoadSettings loads settings to a struct.
+func LoadSettings(settings interface{}) error {
 
 	engine, nestedStruct := settings.(*Engine)
 	if !nestedStruct {
@@ -33,7 +32,7 @@ func LoadUsingReflect(settings interface{}) error {
 			engine.Field.value.Kind() == reflect.Struct {
 			// we check whether the field is pointer or struct
 
-			err = LoadUsingReflect(&Engine{
+			err = LoadSettings(&Engine{
 				Value: engine.Field.value,
 				Type:  engine.Field.value.Type(),
 			})

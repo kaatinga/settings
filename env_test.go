@@ -200,7 +200,7 @@ func TestLoadUsingReflect(t *testing.T) {
 		v := validator.New()
 
 		t.Run(tt.name, func(t *testing.T) {
-			err = LoadUsingReflect(tt.settings)
+			err = LoadSettings(tt.settings)
 
 			spew.Dump(tt.settings)
 
@@ -223,7 +223,7 @@ func TestLoadUsingReflect(t *testing.T) {
 				}
 			}
 
-			t.Errorf("LoadUsingReflect() error is incorrect\nhave %v\nwant %v", err, tt.wantErr)
+			t.Errorf("LoadSettings() error is incorrect\nhave %v\nwant %v", err, tt.wantErr)
 		})
 	}
 }
