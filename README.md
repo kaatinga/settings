@@ -33,7 +33,7 @@ Then import the validator package into your own code.
 
 ### How to use
 
-Create a settings model where you can use tags `env`, `default` and `validate`. Announce a variable and call `LoadUsingReflect()`:
+Create a settings model where you can use tags `env`, `default` and `validate`. Announce a variable and call `LoadSettings()`:
 
 ```go
 type Settings struct {
@@ -44,7 +44,7 @@ type Settings struct {
 }
 
 var settings Settings
-err := LoadUsingReflect(&settings)
+err := LoadSettings(&settings)
 if err != nil {
     return err
 }
@@ -90,7 +90,7 @@ The nested structs that added via pointer must not be necessarily initialized:
 
 ```go
 var settings Model1
-err := LoadUsingReflect(&settings)
+err := LoadSettings(&settings)
 if err != nil {
     return err
 }
@@ -100,7 +100,7 @@ Nonetheless, if you want, you can do it.
 
 ```go
 var settings = Model1{Model2: new(Model2)}
-err := LoadUsingReflect(&settings)
+err := LoadSettings(&settings)
 if err != nil {
     return err
 }
@@ -114,14 +114,14 @@ The configuration model has some limitations in the way how it is arranged and u
 
 ### Empty structs are not allowed
 
-If you add an empty struct to your configuration model, `LoadUsingReflect()` returns error.
+If you add an empty struct to your configuration model, `LoadSettings()` returns error.
 
-### LoadUsingReflect() accepts only pointer to your configuration model
+### LoadSettings() accepts only pointer to your configuration model
 
-The root model must be initialized and added to the `LoadUsingReflect()` signature via pointer:
+The root model must be initialized and added to the `LoadSettings()` signature via pointer:
 
 ```go
-err := LoadUsingReflect(&EnvironmentSettings)
+err := LoadSettings(&EnvironmentSettings)
 if err != nil {
     return err
 }
