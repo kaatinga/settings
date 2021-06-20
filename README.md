@@ -1,10 +1,10 @@
-[![GitHub release](https://img.shields.io/github/release/kaatinga/env_loader.svg)](https://github.com/kaatinga/env_loader/releases)
-[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/kaatinga/env_loader/blob/main/LICENSE)
-[![codecov](https://codecov.io/gh/kaatinga/env_loader/branch/main/graph/badge.svg)](https://codecov.io/gh/kaatinga/env_loader)
-[![lint workflow](https://github.com/kaatinga/env_loader/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/kaatinga/env_loader/actions?query=workflow%3Alinter)
-[![help wanted](https://img.shields.io/badge/Help%20wanted-True-yellow.svg)](https://github.com/kaatinga/env_loader/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22)
+[![GitHub release](https://img.shields.io/github/release/kaatinga/settings.svg)](https://github.com/kaatinga/settings/releases)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/kaatinga/settings/blob/main/LICENSE)
+[![codecov](https://codecov.io/gh/kaatinga/settings/branch/main/graph/badge.svg)](https://codecov.io/gh/kaatinga/settings)
+[![lint workflow](https://github.com/kaatinga/settings/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/kaatinga/settings/actions?query=workflow%3Alinter)
+[![help wanted](https://img.shields.io/badge/Help%20wanted-True-yellow.svg)](https://github.com/kaatinga/settings/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22)
 
-# env_loader
+# settings
 
 The package looks up necessary environment variables and use them to specify settings for your application. In addition, the
 package validates the final struct using standard `validate` tags.
@@ -21,11 +21,11 @@ package validates the final struct using standard `validate` tags.
 
 Use go get.
 
-	go get github.com/kaatinga/env_loader
+	go get github.com/kaatinga/settings
 
 Then import the validator package into your own code.
 
-	import "github.com/kaatinga/env_loader"
+	import "github.com/kaatinga/settings"
 
 <a name=example></a>
 

@@ -1,4 +1,4 @@
-package env_loader
+package settings
 
 import (
 	"github.com/go-playground/validator/v10"

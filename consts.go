@@ -1,4 +1,4 @@
-package env_loader
+package settings
 
 const (
 	// env — env tag name

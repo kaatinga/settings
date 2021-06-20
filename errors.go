@@ -1,4 +1,4 @@
-package env_loader
+package settings
 
 import cer "github.com/kaatinga/const-errs"
 

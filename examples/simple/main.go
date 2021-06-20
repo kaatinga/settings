@@ -1,10 +1,12 @@
+//+build ignore
+
 package main
 
 import (
 	"log"
 	"os"
 
-	env "github.com/kaatinga/env_loader"
+	env "github.com/kaatinga/settings"
 )
 
 type settings struct {
