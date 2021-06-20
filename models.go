@@ -36,6 +36,7 @@ type Loop struct {
 	field             reflect.StructField
 	value             reflect.Value
 	hasEnvTag         bool
+	hasOmitTag        bool
 	hasEnvValue       bool
 	mustBeValidated   bool
 	required          bool
@@ -125,6 +126,12 @@ func (engine *Engine) validateRequired() {
 func (engine *Engine) startIteration(i int) {
 	engine.Field.field = engine.Type.Field(i)
 	engine.Field.value = engine.Value.FieldByName(engine.Field.field.Name)
+
+	// checking the omit tag
+	_, engine.Field.hasOmitTag = engine.Field.field.Tag.Lookup(omit)
+	if engine.Field.hasOmitTag {
+		return
+	}
 
 	// receiving env tag
 	engine.Field.envTag, engine.Field.hasEnvTag = engine.Field.field.Tag.Lookup(env)

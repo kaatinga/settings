@@ -28,6 +28,11 @@ func LoadSettings(settings interface{}) error {
 	for i := 0; i < engine.NumberOfFields; i++ {
 		engine.startIteration(i)
 
+		// passing the omit-tagged fields
+		if engine.Field.hasOmitTag {
+			continue
+		}
+
 		if engine.Field.value.Kind() == reflect.Ptr ||
 			engine.Field.value.Kind() == reflect.Struct {
 			// we check whether the field is pointer or struct

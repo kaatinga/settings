@@ -51,11 +51,18 @@ type settingsWithStruct struct {
 	Internal       *InternalStruct
 }
 
-// complex example
+// complex example 2
 type settingsWithStruct2 struct {
 	Port           int64  `env:"PORT"`
 	PathToDatabase string `env:"DB"`
 	Internal       InternalStruct
+}
+
+// complex example 3 with omitted field
+type settingsWithStruct3 struct {
+	Port           int64  `env:"PORT"`
+	PathToDatabase string `env:"DB"`
+	Internal       *InternalStruct `omit:""`
 }
 
 type settingsWithRequiredTag struct {
@@ -190,6 +197,7 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"empty", &emptySettings{}, ErrTheModelHasEmptyStruct},
 		{"required if failed", &settingWithRequiredIf{}, ErrValidationFailed},
 		{"not_set_env", &simple, nil},
+		{"omitted field", &settingsWithStruct3{}, nil},
 	}
 
 	var err error
