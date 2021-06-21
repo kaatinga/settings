@@ -5,7 +5,7 @@ const (
 	env = "env"
 
 	// omit — excluded from processing fields
-	omit = "omit"
+	omit = "-"
 
 	// defaultSetting — default tag name
 	defaultSetting = "default"

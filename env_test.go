@@ -62,7 +62,7 @@ type settingsWithStruct2 struct {
 type settingsWithStruct3 struct {
 	Port           int64  `env:"PORT"`
 	PathToDatabase string `env:"DB"`
-	Internal       *InternalStruct `omit:""`
+	Internal       *InternalStruct `env:"-"`
 }
 
 type settingsWithRequiredTag struct {
