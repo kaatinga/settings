@@ -133,6 +133,7 @@ func (engine *Engine) startIteration(i int) {
 		engine.Field.mustBeOmitted = true
 		return
 	}
+	engine.Field.mustBeOmitted = false
 
 	// receiving default setting
 	engine.Field.defaultSetting, engine.Field.hasDefaultSetting = engine.Field.field.Tag.Lookup(defaultSetting)

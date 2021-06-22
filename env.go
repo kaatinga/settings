@@ -30,7 +30,6 @@ func LoadSettings(settings interface{}) error {
 
 		// passing the omit-tagged fields
 		if engine.Field.mustBeOmitted {
-			engine.Field.mustBeOmitted = false
 			continue
 		}
 
