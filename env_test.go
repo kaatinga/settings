@@ -9,11 +9,19 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/validator/v10"
+	"github.com/kaatinga/httpeasy"
 	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
 )
 
 type emptySettings struct{}
+
+type Settings struct {
+	MainSettings *httpeasy.Config
+	SessionName   string `env:"SESSION" validate:"required"`
+	PublicKeyPath string `env:"KEY_PATH" validate:"required"`
+	LoggerSettings LoggerOptions
+}
 
 type settingWithRequiredIf struct {
 	RequiredIf string `env:"NOTFOUND" validate:"required_if=Trigger true"`
@@ -151,6 +159,12 @@ func TestLoadUsingReflect(t *testing.T) {
 	os.Setenv("TIMEOUT", "20s")       // nolint
 	os.Setenv("BADPORT", "a")         // nolint
 	os.Setenv("STDOUT", "true")       // nolint
+	os.Setenv("SESSION", "session")       // nolint
+	os.Setenv("KEY_PATH", "/etc")       // nolint
+	os.Setenv("PROD", "true")       // nolint
+	os.Setenv("HAS_DB", "true")       // nolint
+	os.Setenv("DOMAIN", "3lines.club")       // nolint
+	os.Setenv("EMAIL", "email@3lines.club")       // nolint
 
 	var goodSettings1 goodEnvironmentSettings1
 	var goodSettings3withEmptyString goodEnvironmentSettings3withEmptyString
@@ -198,6 +212,7 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"required if failed", &settingWithRequiredIf{}, ErrValidationFailed},
 		{"not_set_env", &simple, nil},
 		{"omitted field", &settingsWithStruct3{}, nil},
+		{"an example", &Settings{}, nil},
 	}
 
 	var err error
