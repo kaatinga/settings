@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"github.com/rs/zerolog"
 	"log/syslog"
 	"os"
 	"reflect"
@@ -8,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
 )
 
@@ -107,31 +107,14 @@ func LoadSettings(settings interface{}) error {
 					}
 
 					// check if whether the value exceeds the type maximum or not
-					if engine.Field.uint64Value > maximum(engine.Field.value.Kind()) {
+					if engine.Field.exceedsMaximumUint() {
 						return incorrectFieldValue(engine.Field.envTag)
 					}
 				}
 
 				engine.Field.value.SetUint(engine.Field.uint64Value)
 
-			case reflect.Int8:
-
-				if engine.Field.value.Type().String() == zerologLevel {
-					// check if it is zerolog.Level
-
-					var level zerolog.Level
-					level, err = zerolog.ParseLevel(engine.Field.envValue)
-					if err != nil {
-						return incorrectFieldValue(engine.Field.envTag)
-					}
-
-					engine.Field.value.SetInt(int64(level))
-					break
-				}
-
-				return unsupportedField(engine.Field.value.Type().Name())
-
-			case reflect.Int64, reflect.Int:
+			case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Int:
 
 				if engine.Field.value.Kind() == reflect.Int &&
 					engine.Field.value.Type().String() == syslogPriority {
@@ -155,12 +138,27 @@ func LoadSettings(settings interface{}) error {
 					}
 					engine.Field.int64Value = engine.Field.durationValue.Nanoseconds()
 
+				} else if engine.Field.value.Type().String() == zerologLevel {
+					// check if it is zerolog.Level
+
+					var level zerolog.Level
+					level, err = zerolog.ParseLevel(engine.Field.envValue)
+					if err != nil {
+						return incorrectFieldValue(engine.Field.envTag)
+					}
+
+					engine.Field.value.SetInt(int64(level))
+					break
 				} else {
-					// int
+					// any int
 
 					engine.Field.int64Value, err = strconv.ParseInt(engine.Field.envValue, 10, 64)
 					if err != nil {
 						return err
+					}
+
+					if engine.Field.notInIntRange() {
+						return incorrectFieldValue(engine.Field.envTag)
 					}
 				}
 
