@@ -44,6 +44,27 @@ type Loop struct {
 	hasDefaultSetting bool
 }
 
+// exceedsMaximumUint возвращает максимальное значение типов uint.
+func (field *Loop) exceedsMaximumUint() bool {
+	kind := field.value.Kind()
+	if kind == reflect.Uint { // TODO: uint не всегда = uint64
+		kind = reflect.Uint64
+	}
+
+	return field.uint64Value > 1<<(2<<(uint64(kind)-6))-1
+}
+
+// notInIntRange возвращает максимальное и минимальное значение типов int.
+func (field *Loop) notInIntRange() bool {
+	kind := field.value.Kind()
+	if kind == reflect.Int { // TODO: int не всегда = int64
+		kind = reflect.Int64
+	}
+
+	return field.int64Value > 1<<((2<<(int64(kind)-1))-1)-1 ||
+		field.int64Value < -1<<((2<<(int64(kind)-1))-1)
+}
+
 // getStruct checks and returns a struct to process.
 func (engine *Engine) getStruct() error {
 	if engine.Value.Kind() == reflect.Ptr {
