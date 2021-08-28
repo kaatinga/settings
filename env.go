@@ -179,19 +179,3 @@ func LoadSettings(settings interface{}) error {
 
 	return nil
 }
-
-// maximum returns the type's maximum value.
-func maximum(kind reflect.Kind) uint64 {
-	switch kind {
-	case reflect.Uint8:
-		return 255
-	case reflect.Uint16:
-		return 65535
-	case reflect.Uint32:
-		return 4294967295
-	case reflect.Uint64, reflect.Uint:
-		return 18446744073709551615
-	default:
-		return 0
-	}
-}
