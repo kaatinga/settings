@@ -17,9 +17,9 @@ import (
 type emptySettings struct{}
 
 type Settings struct {
-	MainSettings *httpeasy.Config
-	SessionName   string `env:"SESSION" validate:"required"`
-	PublicKeyPath string `env:"KEY_PATH" validate:"required"`
+	MainSettings   *httpeasy.Config
+	SessionName    string `env:"SESSION" validate:"required"`
+	PublicKeyPath  string `env:"KEY_PATH" validate:"required"`
 	LoggerSettings LoggerOptions
 }
 
@@ -28,7 +28,7 @@ type settingWithRequiredIf struct {
 	Trigger    bool   `env:"STDOUT"`
 }
 
-type badInt16 struct {
+type Int16 struct {
 	PORT int16 `env:"PORT"`
 }
 
@@ -41,7 +41,7 @@ type settings4 struct {
 }
 
 // settings with unsupported int8
-type badInt8 struct {
+type Int8 struct {
 	Port int8 `env:"PORT"`
 }
 
@@ -68,8 +68,8 @@ type settingsWithStruct2 struct {
 
 // complex example 3 with omitted field
 type settingsWithStruct3 struct {
-	Port           int64  `env:"PORT"`
-	PathToDatabase string `env:"DB"`
+	Port           int64           `env:"PORT"`
+	PathToDatabase string          `env:"DB"`
 	Internal       *InternalStruct `env:"-"`
 }
 
@@ -148,23 +148,23 @@ type simpleConfig struct {
 func TestLoadUsingReflect(t *testing.T) {
 
 	// ENV settings PORT=80;DB=db/file;CACHE=5;BADCACHE1=i;BADCACHE2=300
-	os.Setenv("PORT", "80")           // nolint
-	os.Setenv("DB", "db/file")        // nolint
-	os.Setenv("CACHE", "5")           // nolint
-	os.Setenv("BADCACHE1", "i")       // nolint
-	os.Setenv("BADCACHE2", "300")     // nolint
-	os.Setenv("BADCACHE3", "-1")      // nolint
-	os.Setenv("LOG_LEVEL", "debug")   // nolint
-	os.Setenv("SYSLOG_LEVEL", "info") // nolint
-	os.Setenv("TIMEOUT", "20s")       // nolint
-	os.Setenv("BADPORT", "a")         // nolint
-	os.Setenv("STDOUT", "true")       // nolint
-	os.Setenv("SESSION", "session")       // nolint
-	os.Setenv("KEY_PATH", "/etc")       // nolint
-	os.Setenv("PROD", "true")       // nolint
-	os.Setenv("HAS_DB", "true")       // nolint
-	os.Setenv("DOMAIN", "3lines.club")       // nolint
-	os.Setenv("EMAIL", "email@3lines.club")       // nolint
+	os.Setenv("PORT", "80")                 // nolint
+	os.Setenv("DB", "db/file")              // nolint
+	os.Setenv("CACHE", "5")                 // nolint
+	os.Setenv("BADCACHE1", "i")             // nolint
+	os.Setenv("BADCACHE2", "300")           // nolint
+	os.Setenv("BADCACHE3", "-1")            // nolint
+	os.Setenv("LOG_LEVEL", "debug")         // nolint
+	os.Setenv("SYSLOG_LEVEL", "info")       // nolint
+	os.Setenv("TIMEOUT", "20s")             // nolint
+	os.Setenv("BADPORT", "a")               // nolint
+	os.Setenv("STDOUT", "true")             // nolint
+	os.Setenv("SESSION", "session")         // nolint
+	os.Setenv("KEY_PATH", "/etc")           // nolint
+	os.Setenv("PROD", "true")               // nolint
+	os.Setenv("HAS_DB", "true")             // nolint
+	os.Setenv("DOMAIN", "3lines.club")      // nolint
+	os.Setenv("EMAIL", "email@3lines.club") // nolint
 
 	var goodSettings1 goodEnvironmentSettings1
 	var goodSettings3withEmptyString goodEnvironmentSettings3withEmptyString
@@ -206,8 +206,8 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"complex with required tag", &requiredField, ErrValidationFailed},
 		{"zerolog and syslog fields", &zerologSyslog, nil},
 		{"logrus and duration", &settings4{}, nil},
-		{"int8", &badInt8{}, ErrUnsupportedField},
-		{"int16", &badInt16{}, ErrUnsupportedField},
+		{"int8", &Int8{}, nil},
+		{"int16", &Int16{}, nil},
 		{"empty", &emptySettings{}, ErrTheModelHasEmptyStruct},
 		{"required if failed", &settingWithRequiredIf{}, ErrValidationFailed},
 		{"not_set_env", &simple, nil},
