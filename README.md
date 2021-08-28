@@ -60,8 +60,8 @@ The `validate` tag may contain an optional validation rule fallowing the documen
 | -------------          | ------------- |
 | string                 | -             | 
 | boolean                | -             | 
+| any int                | -             | 
 | any uint               | -             | 
-| int, int64             | -             | 
 | logrus.Level           | uint32        | 
 | syslog.Priority        | int           | 
 | time.Duration          | int64         | 
