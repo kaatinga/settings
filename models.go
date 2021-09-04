@@ -42,6 +42,7 @@ type Loop struct {
 	required          bool
 	defaultSetting    string
 	hasDefaultSetting bool
+	float64Value      float64
 }
 
 // exceedsMaximumUint возвращает максимальное значение типов uint.
