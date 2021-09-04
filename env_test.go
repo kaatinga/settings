@@ -2,7 +2,6 @@ package settings
 
 import (
 	"errors"
-	"log/syslog"
 	"os"
 	"testing"
 	"time"
@@ -28,8 +27,9 @@ type settingWithRequiredIf struct {
 	Trigger    bool   `env:"STDOUT"`
 }
 
-type Int16 struct {
+type Int16AndFloat64 struct {
 	PORT int16 `env:"PORT"`
+	FLOAT float64 `env:"FLOAT"`
 }
 
 // settings with logrus.Level and time.Duration 4
@@ -49,7 +49,7 @@ type NotAStruct string
 
 type settingsWithZerologSyslog struct {
 	LogLevel       zerolog.Level   `env:"LOG_LEVEL"`
-	SyslogPriority syslog.Priority `env:"SYSLOG_LEVEL"`
+	//SyslogPriority syslog.Priority `env:"SYSLOG_LEVEL"`
 }
 
 // complex example
@@ -149,6 +149,7 @@ func TestLoadUsingReflect(t *testing.T) {
 
 	// ENV settings PORT=80;DB=db/file;CACHE=5;BADCACHE1=i;BADCACHE2=300
 	os.Setenv("PORT", "80")                 // nolint
+	os.Setenv("FLOAT", "80.1")                 // nolint
 	os.Setenv("DB", "db/file")              // nolint
 	os.Setenv("CACHE", "5")                 // nolint
 	os.Setenv("BADCACHE1", "i")             // nolint
@@ -190,7 +191,7 @@ func TestLoadUsingReflect(t *testing.T) {
 	}{
 		{"ok1", &goodSettings1, nil},
 		{"ok2", &goodSettings3withEmptyString, nil},
-		{"!ok1", good2, ErrNotAddressable},
+		{"!ok1", good2, ErrNotAddressableField},
 		{"ok3", &good2, nil},
 		{"!ok2", &badSettings2, ErrIncorrectFieldValue},
 		{"!ok3", &badSettings3, ErrIncorrectFieldValue},
@@ -207,7 +208,7 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"zerolog and syslog fields", &zerologSyslog, nil},
 		{"logrus and duration", &settings4{}, nil},
 		{"int8", &Int8{}, nil},
-		{"int16", &Int16{}, nil},
+		{"int16", &Int16AndFloat64{}, nil},
 		{"empty", &emptySettings{}, ErrTheModelHasEmptyStruct},
 		{"required if failed", &settingWithRequiredIf{}, ErrValidationFailed},
 		{"not_set_env", &simple, nil},
@@ -219,6 +220,8 @@ func TestLoadUsingReflect(t *testing.T) {
 
 	//nolint
 	for _, tt := range tests {
+
+		t.Log("\n\n")
 
 		v := validator.New()
 
