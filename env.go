@@ -2,7 +2,6 @@ package settings
 
 import (
 	"github.com/rs/zerolog"
-	"log/syslog"
 	"os"
 	"reflect"
 	"strconv"
@@ -77,14 +76,23 @@ func LoadSettings(settings interface{}) error {
 				return ErrInternalFailure
 			}
 
-			// The struct must be send via pointer.
+			// We are checking if the field is addressable
 			if !engine.Value.Field(i).CanSet() {
-				return ErrNotAddressable
+				return ErrNotAddressableField
 			}
 
 			switch engine.Field.value.Kind() {
 			case reflect.String:
 				engine.Field.value.SetString(engine.Field.envValue)
+			case reflect.Float64:
+
+				engine.Field.float64Value, err = strconv.ParseFloat(engine.Field.envValue, 64)
+				if err != nil {
+					return incorrectFieldValue(engine.Field.envTag)
+				}
+
+				engine.Field.value.SetFloat(engine.Field.float64Value)
+
 			case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uint:
 
 				if engine.Field.value.Kind() == reflect.Uint32 &&
@@ -120,13 +128,10 @@ func LoadSettings(settings interface{}) error {
 					engine.Field.value.Type().String() == syslogPriority {
 					// check if it is syslog.Priority
 
-					var priority syslog.Priority
-					priority, err = ParseSyslogPriority(engine.Field.envValue)
+					engine.Field.int64Value, err = engine.Field.parseSyslog()
 					if err != nil {
 						return err
 					}
-
-					engine.Field.int64Value = int64(priority)
 
 				} else if engine.Field.value.Kind() == reflect.Int64 &&
 					engine.Field.value.Type().String() == duration {
