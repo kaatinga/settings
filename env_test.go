@@ -141,7 +141,7 @@ type badEnvironmentSettings2PlusValidation struct {
 }
 
 type simpleConfig struct {
-	DBURL   string        `env:"DB_URL" default:"127.0.0.1"`
+	DBURL   string        `env:"DB_URL" default:"127.0.0.1" validate:"ip_addr"`
 	Timeout time.Duration `env:"DB_TIMEOUT" default:"5s"`
 }
 
