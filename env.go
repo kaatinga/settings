@@ -59,15 +59,13 @@ func LoadSettings(settings interface{}) error {
 			// we return error
 			engine.Field.envValue, engine.Field.hasEnvValue = os.LookupEnv(engine.Field.envTag)
 			if !engine.Field.hasEnvValue {
-				if engine.Field.required {
-					return engine.validationFailed()
-				}
-
 				if engine.Field.hasDefaultSetting {
 					// substitute the envValue with default setting
 					engine.Field.envValue = engine.Field.defaultSetting
 				} else {
-					// finish processing the current field
+					if engine.Field.required {
+						return engine.validationFailed()
+					}
 					continue
 				}
 			}
