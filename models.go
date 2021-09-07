@@ -120,6 +120,8 @@ func (engine *Engine) validationFailed() error {
 
 func (engine *Engine) validateRequired() {
 
+	engine.Field.required = false
+
 	// receiving the 'validate' tag value
 	engine.Field.validationRule, engine.Field.mustBeValidated = engine.Field.field.Tag.Lookup("validate")
 
