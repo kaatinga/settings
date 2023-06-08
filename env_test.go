@@ -6,20 +6,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/validator/v10"
-	"github.com/kaatinga/httpeasy"
-	"github.com/rs/zerolog"
-	"github.com/sirupsen/logrus"
 )
 
 type emptySettings struct{}
 
 type Settings struct {
-	MainSettings   *httpeasy.Config
-	SessionName    string `env:"SESSION" validate:"required"`
-	PublicKeyPath  string `env:"KEY_PATH" validate:"required"`
-	LoggerSettings LoggerOptions
+	SessionName   string `env:"SESSION" validate:"required"`
+	PublicKeyPath string `env:"KEY_PATH" validate:"required"`
 }
 
 type settingWithRequiredIf struct {
@@ -28,16 +22,15 @@ type settingWithRequiredIf struct {
 }
 
 type Int16AndFloat64 struct {
-	PORT int16 `env:"PORT"`
+	PORT  int16   `env:"PORT"`
 	FLOAT float64 `env:"FLOAT"`
 }
 
 // settings with logrus.Level and time.Duration 4
 type settings4 struct {
-	Port     uint16        `env:"PORT"`
-	LogLevel logrus.Level  `env:"LOG_LEVEL"`
-	Timeout  time.Duration `env:"TIMEOUT"`
-	Stdout   bool          `env:"STDOUT"`
+	Port    uint16        `env:"PORT"`
+	Timeout time.Duration `env:"TIMEOUT"`
+	Stdout  bool          `env:"STDOUT"`
 }
 
 // settings with unsupported int8
@@ -46,11 +39,6 @@ type Int8 struct {
 }
 
 type NotAStruct string
-
-type settingsWithZerologSyslog struct {
-	LogLevel       zerolog.Level   `env:"LOG_LEVEL"`
-	//SyslogPriority syslog.Priority `env:"SYSLOG_LEVEL"`
-}
 
 // complex example
 type settingsWithStruct struct {
@@ -148,24 +136,24 @@ type simpleConfig struct {
 func TestLoadUsingReflect(t *testing.T) {
 
 	// ENV settings PORT=80;DB=db/file;CACHE=5;BADCACHE1=i;BADCACHE2=300
-	os.Setenv("PORT", "80")                 // nolint
-	os.Setenv("FLOAT", "80.1")                 // nolint
-	os.Setenv("DB", "db/file")              // nolint
-	os.Setenv("CACHE", "5")                 // nolint
-	os.Setenv("BADCACHE1", "i")             // nolint
-	os.Setenv("BADCACHE2", "300")           // nolint
-	os.Setenv("BADCACHE3", "-1")            // nolint
-	os.Setenv("LOG_LEVEL", "debug")         // nolint
-	os.Setenv("SYSLOG_LEVEL", "info")       // nolint
-	os.Setenv("TIMEOUT", "20s")             // nolint
-	os.Setenv("BADPORT", "a")               // nolint
-	os.Setenv("STDOUT", "true")             // nolint
-	os.Setenv("SESSION", "session")         // nolint
-	os.Setenv("KEY_PATH", "/etc")           // nolint
-	os.Setenv("PROD", "true")               // nolint
-	os.Setenv("HAS_DB", "true")             // nolint
-	os.Setenv("DOMAIN", "3lines.club")      // nolint
-	os.Setenv("EMAIL", "email@3lines.club") // nolint
+	_ = os.Setenv("PORT", "80")                 // nolint
+	_ = os.Setenv("FLOAT", "80.1")              // nolint
+	_ = os.Setenv("DB", "db/file")              // nolint
+	_ = os.Setenv("CACHE", "5")                 // nolint
+	_ = os.Setenv("BADCACHE1", "i")             // nolint
+	_ = os.Setenv("BADCACHE2", "300")           // nolint
+	_ = os.Setenv("BADCACHE3", "-1")            // nolint
+	_ = os.Setenv("LOG_LEVEL", "debug")         // nolint
+	_ = os.Setenv("SYSLOG_LEVEL", "info")       // nolint
+	_ = os.Setenv("TIMEOUT", "20s")             // nolint
+	_ = os.Setenv("BADPORT", "a")               // nolint
+	_ = os.Setenv("STDOUT", "true")             // nolint
+	_ = os.Setenv("SESSION", "session")         // nolint
+	_ = os.Setenv("KEY_PATH", "/etc")           // nolint
+	_ = os.Setenv("PROD", "true")               // nolint
+	_ = os.Setenv("HAS_DB", "true")             // nolint
+	_ = os.Setenv("DOMAIN", "3lines.club")      // nolint
+	_ = os.Setenv("EMAIL", "email@3lines.club") // nolint
 
 	var goodSettings1 goodEnvironmentSettings1
 	var goodSettings3withEmptyString goodEnvironmentSettings3withEmptyString
@@ -181,7 +169,6 @@ func TestLoadUsingReflect(t *testing.T) {
 	var complex2 = &complex1
 	var complex3 = settingsWithStruct2{}
 	var requiredField = settingsWithRequiredTag{}
-	var zerologSyslog = settingsWithZerologSyslog{}
 	var simple simpleConfig
 
 	tests := []struct {
@@ -205,8 +192,7 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"complex with pointer", &complex1, nil},
 		{"complex with a struct without pointer", &complex3, nil},
 		{"complex with required tag", &requiredField, ErrValidationFailed},
-		{"zerolog and syslog fields", &zerologSyslog, nil},
-		{"logrus and duration", &settings4{}, nil},
+		{"duration", &settings4{}, nil},
 		{"int8", &Int8{}, nil},
 		{"int16", &Int16AndFloat64{}, nil},
 		{"empty", &emptySettings{}, ErrTheModelHasEmptyStruct},
@@ -220,15 +206,12 @@ func TestLoadUsingReflect(t *testing.T) {
 
 	//nolint
 	for _, tt := range tests {
-
 		t.Log("\n\n")
 
 		v := validator.New()
 
 		t.Run(tt.name, func(t *testing.T) {
 			err = LoadSettings(tt.settings)
-
-			spew.Dump(tt.settings)
 
 			if errors.Is(err, tt.wantErr) {
 				if err != nil {

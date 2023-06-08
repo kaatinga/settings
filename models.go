@@ -45,20 +45,20 @@ type Loop struct {
 	float64Value      float64
 }
 
-// exceedsMaximumUint возвращает максимальное значение типов uint.
+// exceedsMaximumUint returns true if the value exceeds the maximum uint value.
 func (field *Loop) exceedsMaximumUint() bool {
 	kind := field.value.Kind()
-	if kind == reflect.Uint { // TODO: uint не всегда = uint64
+	if kind == reflect.Uint {
 		kind = reflect.Uint64
 	}
 
 	return field.uint64Value > 1<<(2<<(uint64(kind)-6))-1
 }
 
-// notInIntRange возвращает максимальное и минимальное значение типов int.
+// notInIntRange returns true if the value is not in the int range.
 func (field *Loop) notInIntRange() bool {
 	kind := field.value.Kind()
-	if kind == reflect.Int { // TODO: int не всегда = int64
+	if kind == reflect.Int {
 		kind = reflect.Int64
 	}
 
@@ -134,17 +134,6 @@ func (engine *Engine) validateRequired() {
 		}
 	}
 }
-
-// validate validates the current value using `validate` tag.
-//func (engine *Engine) validate() error {
-//
-//	if engine.Field.mustBeValidated &&
-//		engine.Validate.Var(engine.Field.value.Interface(), engine.Field.validationRule) != nil {
-//		return engine.validationFailed()
-//	}
-//
-//	return nil
-//}
 
 // startIteration launches field processing.
 func (engine *Engine) startIteration(i int) {

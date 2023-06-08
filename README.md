@@ -62,8 +62,6 @@ The `validate` tag may contain an optional validation rule fallowing the documen
 | boolean                | -             | 
 | any int                | -             | 
 | any uint               | -             | 
-| logrus.Level           | uint32        | 
-| syslog.Priority        | int           | 
 | time.Duration          | int64         | 
 
 ### Nested structs

@@ -12,7 +12,6 @@ const (
 	ErrInternalFailure     cer.Error = "an internal package error"
 	ErrIncorrectFieldValue cer.Error = "variable has been found but has incorrect value"
 	ErrValidationFailed    cer.Error = "field validation failed"
-	ErrIncorrectPriority   cer.Error = "incorrect syslog priority"
 )
 
 type unsupportedField string
@@ -47,15 +46,4 @@ func (err *validationFailed) Error() string {
 
 func (err *validationFailed) Is(target error) bool {
 	return target == ErrValidationFailed //nolint:errorlint
-}
-
-// incorrectPriority — error for ParseSyslogPriority()
-type incorrectPriority string
-
-func (err incorrectPriority) Error() string {
-	return "syslog priority " + string(err) + " is incorrect"
-}
-
-func (err incorrectPriority) Is(target error) bool {
-	return target == ErrIncorrectPriority //nolint:errorlint
 }

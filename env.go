@@ -1,19 +1,15 @@
 package settings
 
 import (
-	"github.com/rs/zerolog"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 // LoadSettings loads settings to a struct.
 func LoadSettings(settings interface{}) error {
-
 	engine, nestedStruct := settings.(*Engine)
 	if !nestedStruct {
 		engine = newEngine(settings)
@@ -82,8 +78,8 @@ func LoadSettings(settings interface{}) error {
 			switch engine.Field.value.Kind() {
 			case reflect.String:
 				engine.Field.value.SetString(engine.Field.envValue)
-			case reflect.Float64:
 
+			case reflect.Float64:
 				engine.Field.float64Value, err = strconv.ParseFloat(engine.Field.envValue, 64)
 				if err != nil {
 					return incorrectFieldValue(engine.Field.envTag)
@@ -92,46 +88,20 @@ func LoadSettings(settings interface{}) error {
 				engine.Field.value.SetFloat(engine.Field.float64Value)
 
 			case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uint:
+				engine.Field.uint64Value, err = strconv.ParseUint(engine.Field.envValue, 10, 64)
+				if err != nil {
+					return incorrectFieldValue(engine.Field.envTag)
+				}
 
-				if engine.Field.value.Kind() == reflect.Uint32 &&
-					engine.Field.value.Type().String() == logrusLevel {
-					// check if it is logrus.level
-
-					var level logrus.Level
-					level, err = logrus.ParseLevel(engine.Field.envValue)
-					if err != nil {
-						return incorrectFieldValue(engine.Field.envTag)
-					}
-					engine.Field.uint64Value = uint64(level)
-
-				} else {
-					// uint
-
-					engine.Field.uint64Value, err = strconv.ParseUint(engine.Field.envValue, 10, 64)
-					if err != nil {
-						return incorrectFieldValue(engine.Field.envTag)
-					}
-
-					// check if whether the value exceeds the type maximum or not
-					if engine.Field.exceedsMaximumUint() {
-						return incorrectFieldValue(engine.Field.envTag)
-					}
+				// check if whether the value exceeds the type maximum or not
+				if engine.Field.exceedsMaximumUint() {
+					return incorrectFieldValue(engine.Field.envTag)
 				}
 
 				engine.Field.value.SetUint(engine.Field.uint64Value)
 
 			case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Int:
-
-				if engine.Field.value.Kind() == reflect.Int &&
-					engine.Field.value.Type().String() == syslogPriority {
-					// check if it is syslog.Priority
-
-					engine.Field.int64Value, err = engine.Field.parseSyslog()
-					if err != nil {
-						return err
-					}
-
-				} else if engine.Field.value.Kind() == reflect.Int64 &&
+				if engine.Field.value.Kind() == reflect.Int64 &&
 					engine.Field.value.Type().String() == duration {
 					// check if it is time.Duration
 
@@ -140,21 +110,7 @@ func LoadSettings(settings interface{}) error {
 						return err
 					}
 					engine.Field.int64Value = engine.Field.durationValue.Nanoseconds()
-
-				} else if engine.Field.value.Type().String() == zerologLevel {
-					// check if it is zerolog.Level
-
-					var level zerolog.Level
-					level, err = zerolog.ParseLevel(engine.Field.envValue)
-					if err != nil {
-						return incorrectFieldValue(engine.Field.envTag)
-					}
-
-					engine.Field.value.SetInt(int64(level))
-					break
 				} else {
-					// any int
-
 					engine.Field.int64Value, err = strconv.ParseInt(engine.Field.envValue, 10, 64)
 					if err != nil {
 						return err
