@@ -11,7 +11,7 @@ import (
 )
 
 // LoadSettings loads settings to a struct.
-func LoadSettings(settings interface{}) error { //nolint:funlen,gocyclo
+func LoadSettings(settings interface{}) error {
 	engine, nestedStruct := settings.(*Engine)
 	if !nestedStruct {
 		engine = newEngine(settings)

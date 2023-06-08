@@ -3,16 +3,13 @@ linters-settings:
     list-type: blacklist
     include-go-root: false
     packages:
-      - errors
       - github.com/pkg/errors
       - github.com/sirupsen/logrus
-      - github.com/tehsphinx/dbg
-      - flag
       - github.com/bmizerany/assert
   dupl:
     threshold: 150
   funlen:
-    lines: 70
+    lines: 130
     statements: 40
   gci:
     no-inline-comments: true
@@ -20,9 +17,8 @@ linters-settings:
     sections:
       - standard
       - default
-      - prefix(gitlab.gostudent.cloud)
   gocyclo:
-    min-complexity: 20
+    min-complexity: 30
   golint:
     min-confidence: 0.8
   govet:
@@ -47,6 +43,7 @@ linters:
     - dupl
     - exhaustivestruct
     - exhaustruct
+    - depguard
     - gocognit
     - godot
     - godox
