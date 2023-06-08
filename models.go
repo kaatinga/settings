@@ -1,10 +1,11 @@
 package settings
 
 import (
-	"github.com/go-playground/validator/v10"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/go-playground/validator/v10"
 )
 
 // Engine — data model to process settings.
@@ -47,21 +48,23 @@ type Loop struct {
 
 // exceedsMaximumUint returns true if the value exceeds the maximum uint value.
 func (field *Loop) exceedsMaximumUint() bool {
-	kind := field.value.Kind()
-	if kind == reflect.Uint {
+	var kind reflect.Kind
+	if kind = field.value.Kind(); kind == reflect.Uint {
 		kind = reflect.Uint64
 	}
 
+	//nolint:gomnd // it is a formula
 	return field.uint64Value > 1<<(2<<(uint64(kind)-6))-1
 }
 
 // notInIntRange returns true if the value is not in the int range.
 func (field *Loop) notInIntRange() bool {
-	kind := field.value.Kind()
-	if kind == reflect.Int {
+	var kind reflect.Kind
+	if kind = field.value.Kind(); kind == reflect.Int {
 		kind = reflect.Int64
 	}
 
+	//nolint:gomnd // it is a formula
 	return field.int64Value > 1<<((2<<(int64(kind)-1))-1)-1 ||
 		field.int64Value < -1<<((2<<(int64(kind)-1))-1)
 }
@@ -69,10 +72,8 @@ func (field *Loop) notInIntRange() bool {
 // getStruct checks and returns a struct to process.
 func (engine *Engine) getStruct() error {
 	if engine.Value.Kind() == reflect.Ptr {
-
 		// initing struct if it is added via pointer
 		if engine.Value.IsNil() {
-
 			// the main struct must be inited
 			// the third law of reflection
 			// https://blog.golang.org/laws-of-reflection
@@ -109,9 +110,9 @@ func (engine *Engine) getStruct() error {
 	return nil
 }
 
-// validationFailed forms validation error.
+// validationFailedError forms validation error.
 func (engine *Engine) validationFailed() error {
-	return &validationFailed{
+	return &validationFailedError{
 		Name:           engine.Field.field.Name,
 		Type:           engine.Field.value.Type().String(),
 		ValidationRule: engine.Field.validationRule,
@@ -119,7 +120,6 @@ func (engine *Engine) validationFailed() error {
 }
 
 func (engine *Engine) validateRequired() {
-
 	engine.Field.required = false
 
 	// receiving the 'validate' tag value

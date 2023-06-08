@@ -1,3 +1,5 @@
+//go:build amd64 || arm64
+
 package settings
 
 import (
@@ -9,7 +11,7 @@ import (
 )
 
 // LoadSettings loads settings to a struct.
-func LoadSettings(settings interface{}) error {
+func LoadSettings(settings interface{}) error { //nolint:funlen,gocyclo
 	engine, nestedStruct := settings.(*Engine)
 	if !nestedStruct {
 		engine = newEngine(settings)
@@ -28,7 +30,7 @@ func LoadSettings(settings interface{}) error {
 			continue
 		}
 
-		if engine.Field.value.Kind() == reflect.Ptr ||
+		if engine.Field.value.Kind() == reflect.Ptr || //nolint:nestif
 			engine.Field.value.Kind() == reflect.Struct {
 			// we check whether the field is pointer or struct
 
@@ -40,9 +42,7 @@ func LoadSettings(settings interface{}) error {
 				return err
 			}
 			continue
-
 		} else {
-
 			// if a field has no env tag, we pass such a field
 			if !engine.Field.hasEnvTag {
 				continue
@@ -75,14 +75,14 @@ func LoadSettings(settings interface{}) error {
 				return ErrNotAddressableField
 			}
 
-			switch engine.Field.value.Kind() {
+			switch engine.Field.value.Kind() { //nolint:exhaustive
 			case reflect.String:
 				engine.Field.value.SetString(engine.Field.envValue)
 
 			case reflect.Float64:
 				engine.Field.float64Value, err = strconv.ParseFloat(engine.Field.envValue, 64)
 				if err != nil {
-					return incorrectFieldValue(engine.Field.envTag)
+					return incorrectFieldValueError(engine.Field.envTag)
 				}
 
 				engine.Field.value.SetFloat(engine.Field.float64Value)
@@ -90,12 +90,12 @@ func LoadSettings(settings interface{}) error {
 			case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uint:
 				engine.Field.uint64Value, err = strconv.ParseUint(engine.Field.envValue, 10, 64)
 				if err != nil {
-					return incorrectFieldValue(engine.Field.envTag)
+					return incorrectFieldValueError(engine.Field.envTag)
 				}
 
 				// check if whether the value exceeds the type maximum or not
 				if engine.Field.exceedsMaximumUint() {
-					return incorrectFieldValue(engine.Field.envTag)
+					return incorrectFieldValueError(engine.Field.envTag)
 				}
 
 				engine.Field.value.SetUint(engine.Field.uint64Value)
@@ -117,7 +117,7 @@ func LoadSettings(settings interface{}) error {
 					}
 
 					if engine.Field.notInIntRange() {
-						return incorrectFieldValue(engine.Field.envTag)
+						return incorrectFieldValueError(engine.Field.envTag)
 					}
 				}
 
@@ -126,7 +126,7 @@ func LoadSettings(settings interface{}) error {
 			case reflect.Bool:
 				engine.Field.value.SetBool(strings.ToLower(engine.Field.envValue) == "true")
 			default:
-				return unsupportedField(engine.Field.value.Type().Name())
+				return unsupportedFieldError(engine.Field.value.Type().Name())
 			}
 		}
 	}

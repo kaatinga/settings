@@ -14,36 +14,36 @@ const (
 	ErrValidationFailed    cer.Error = "field validation failed"
 )
 
-type unsupportedField string
+type unsupportedFieldError string
 
-func (err unsupportedField) Error() string {
+func (err unsupportedFieldError) Error() string {
 	return "environment variable " + string(err) + " has been found but the field type is unsupported"
 }
 
-func (err unsupportedField) Is(target error) bool {
-	return target == ErrUnsupportedField //nolint:errorlint
+func (err unsupportedFieldError) Is(target error) bool {
+	return target == ErrUnsupportedField //nolint:goerr113
 }
 
-type incorrectFieldValue string
+type incorrectFieldValueError string
 
-func (err incorrectFieldValue) Error() string {
+func (err incorrectFieldValueError) Error() string {
 	return "environment variable " + string(err) + " has been found but has incorrect value"
 }
 
-func (err incorrectFieldValue) Is(target error) bool {
-	return target == ErrIncorrectFieldValue //nolint:errorlint
+func (err incorrectFieldValueError) Is(target error) bool {
+	return target == ErrIncorrectFieldValue //nolint:goerr113
 }
 
-type validationFailed struct {
+type validationFailedError struct {
 	Name           string
 	Type           string
 	ValidationRule string
 }
 
-func (err *validationFailed) Error() string {
+func (err *validationFailedError) Error() string {
 	return "validation with rule '" + err.ValidationRule + "' failed on the field '" + err.Name + "' of '" + err.Type + "' type"
 }
 
-func (err *validationFailed) Is(target error) bool {
-	return target == ErrValidationFailed //nolint:errorlint
+func (err *validationFailedError) Is(target error) bool {
+	return target == ErrValidationFailed //nolint:goerr113
 }

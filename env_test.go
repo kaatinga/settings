@@ -2,7 +2,6 @@ package settings
 
 import (
 	"errors"
-	"os"
 	"testing"
 	"time"
 
@@ -134,26 +133,25 @@ type simpleConfig struct {
 }
 
 func TestLoadUsingReflect(t *testing.T) {
-
 	// ENV settings PORT=80;DB=db/file;CACHE=5;BADCACHE1=i;BADCACHE2=300
-	_ = os.Setenv("PORT", "80")                 // nolint
-	_ = os.Setenv("FLOAT", "80.1")              // nolint
-	_ = os.Setenv("DB", "db/file")              // nolint
-	_ = os.Setenv("CACHE", "5")                 // nolint
-	_ = os.Setenv("BADCACHE1", "i")             // nolint
-	_ = os.Setenv("BADCACHE2", "300")           // nolint
-	_ = os.Setenv("BADCACHE3", "-1")            // nolint
-	_ = os.Setenv("LOG_LEVEL", "debug")         // nolint
-	_ = os.Setenv("SYSLOG_LEVEL", "info")       // nolint
-	_ = os.Setenv("TIMEOUT", "20s")             // nolint
-	_ = os.Setenv("BADPORT", "a")               // nolint
-	_ = os.Setenv("STDOUT", "true")             // nolint
-	_ = os.Setenv("SESSION", "session")         // nolint
-	_ = os.Setenv("KEY_PATH", "/etc")           // nolint
-	_ = os.Setenv("PROD", "true")               // nolint
-	_ = os.Setenv("HAS_DB", "true")             // nolint
-	_ = os.Setenv("DOMAIN", "3lines.club")      // nolint
-	_ = os.Setenv("EMAIL", "email@3lines.club") // nolint
+	t.Setenv("PORT", "80")
+	t.Setenv("FLOAT", "80.1")
+	t.Setenv("DB", "db/file")
+	t.Setenv("CACHE", "5")
+	t.Setenv("BADCACHE1", "i")
+	t.Setenv("BADCACHE2", "300")
+	t.Setenv("BADCACHE3", "-1")
+	t.Setenv("LOG_LEVEL", "debug")
+	t.Setenv("SYSLOG_LEVEL", "info")
+	t.Setenv("TIMEOUT", "20s")
+	t.Setenv("BADPORT", "a")
+	t.Setenv("STDOUT", "true")
+	t.Setenv("SESSION", "session")
+	t.Setenv("KEY_PATH", "/etc")
+	t.Setenv("PROD", "true")
+	t.Setenv("HAS_DB", "true")
+	t.Setenv("DOMAIN", "3lines.club")
+	t.Setenv("EMAIL", "email@3lines.club")
 
 	var goodSettings1 goodEnvironmentSettings1
 	var goodSettings3withEmptyString goodEnvironmentSettings3withEmptyString
