@@ -1,11 +1,12 @@
 linters-settings:
-  depguard:
-    list-type: blacklist
-    include-go-root: false
-    packages:
-      - github.com/pkg/errors
-      - github.com/sirupsen/logrus
-      - github.com/bmizerany/assert
+  additional-guards:
+    - list-type: denylist
+      include-go-root: false
+      packages:
+        - github.com/stretchr/testify
+      # Specify rules by which the linter ignores certain files for consideration.
+      ignore-file-rules:
+        - "env_test.go"
   dupl:
     threshold: 150
   funlen:
