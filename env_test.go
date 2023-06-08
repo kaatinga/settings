@@ -128,8 +128,8 @@ type badEnvironmentSettings2PlusValidation struct {
 }
 
 type simpleConfig struct {
-	DBURL   string        `env:"DB_URL" default:"127.0.0.1" validate:"required"`
-	Timeout time.Duration `env:"DB_TIMEOUT" default:"5s"`
+	DBURL   string        `default:"127.0.0.1" env:"DB_URL" validate:"required"`
+	Timeout time.Duration `default:"5s" env:"DB_TIMEOUT"`
 }
 
 func TestLoadUsingReflect(t *testing.T) {
