@@ -1,3 +1,4 @@
+[![Tests](https://github.com/kaatinga/luna/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/kaatinga/luna/actions/workflows/test.yml)
 [![GitHub release](https://img.shields.io/github/release/kaatinga/settings.svg)](https://github.com/kaatinga/settings/releases)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/kaatinga/settings/blob/main/LICENSE)
 [![codecov](https://codecov.io/gh/kaatinga/settings/branch/main/graph/badge.svg)](https://codecov.io/gh/kaatinga/settings)
@@ -126,4 +127,3 @@ if err != nil {
 ```
 
 Otherwise, the function returns error.
-[![Tests](https://github.com/kaatinga/luna/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/kaatinga/luna/actions/workflows/test.yml)
