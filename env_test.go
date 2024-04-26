@@ -11,7 +11,7 @@ import (
 type emptySettings struct{}
 
 type Settings struct {
-	SessionName   string `env:"SESSION" validate:"required"`
+	SessionName   string `env:"SESSION"  validate:"required"`
 	PublicKeyPath string `env:"KEY_PATH" validate:"required"`
 }
 
@@ -111,25 +111,25 @@ type badEnvironmentSettings4 struct {
 // test structure #7
 type goodEnvironmentSettings1PlusValidation struct {
 	Port           string `env:"PORT" validate:"numeric"`
-	PathToDatabase string `env:"DB" validate:"required"`
+	PathToDatabase string `env:"DB"   validate:"required"`
 }
 
 // test structure #8
 type badEnvironmentSettings1PlusValidation struct {
 	Port           string `env:"BADPORT" validate:"numeric"`
-	PathToDatabase string `env:"DB" validate:"required"`
+	PathToDatabase string `env:"DB"      validate:"required"`
 }
 
 // test structure #9
 type badEnvironmentSettings2PlusValidation struct {
-	Port           string `env:"PORT" validate:"numeric"`
-	PathToDatabase string `env:"DB" validate:"required"`
+	Port           string `env:"PORT"  validate:"numeric"`
+	PathToDatabase string `env:"DB"    validate:"required"`
 	CacheSize      byte   `env:"CACHE" validate:"min=10"`
 }
 
 type simpleConfig struct {
-	DBURL   string        `default:"127.0.0.1" env:"DB_URL" validate:"required"`
-	Timeout time.Duration `default:"5s" env:"DB_TIMEOUT"`
+	DBURL   string        `default:"127.0.0.1" env:"DB_URL"      validate:"required"`
+	Timeout time.Duration `default:"5s"        env:"DB_TIMEOUT"`
 }
 
 func TestLoadUsingReflect(t *testing.T) {
@@ -209,7 +209,7 @@ func TestLoadUsingReflect(t *testing.T) {
 		v := validator.New()
 
 		t.Run(tt.name, func(t *testing.T) {
-			err = LoadSettings(tt.settings)
+			err = Load(tt.settings)
 
 			if errors.Is(err, tt.wantErr) {
 				if err != nil {
@@ -230,7 +230,7 @@ func TestLoadUsingReflect(t *testing.T) {
 				}
 			}
 
-			t.Errorf("LoadSettings() error is incorrect\nhave %v\nwant %v", err, tt.wantErr)
+			t.Errorf("Load() error is incorrect\nhave %v\nwant %v", err, tt.wantErr)
 		})
 	}
 }

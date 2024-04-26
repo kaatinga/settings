@@ -1,4 +1,5 @@
-//+build ignore
+//go:build ignore
+// +build ignore
 
 package main
 
@@ -22,7 +23,7 @@ func main() {
 		log.Fatalf("set env error, %s", err)
 	}
 	var sett settings
-	err = env.LoadSettings(&sett)
+	err = env.Load(&sett)
 	if err != nil {
 		log.Fatalf("load error happened, %s", err)
 	}

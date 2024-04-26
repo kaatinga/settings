@@ -7,34 +7,31 @@
 
 # settings
 
-The package looks up necessary environment variables and use them to specify settings for your application. In addition, the
-package validates the final struct using standard `validate` tags.
+The package looks up necessary environment variables and uses them to specify settings for your application. In addition, the package validates the final struct using standard `validate` tags.
 
 ## Contents
 
-1. [Installation](#installation)
-2. [Example](#example)
-3. [Limitations](#limits)
-
-<a name=installation></a>
+1. [Installation](#1-installation)
+2. [Description](#2-description)
+3. [Limitations](#3-limitations)
 
 ## 1. Installation
 
-Use go get.
+Use `go get` to install the package:
+```bash
+go get github.com/kaatinga/settings
+````
 
-	go get github.com/kaatinga/settings
-
-Then import the validator package into your own code.
-
-	import "github.com/kaatinga/settings"
-
-<a name=example></a>
+Then, import the package into your own code:
+```go
+import "github.com/kaatinga/settings"
+```
 
 ## 2. Description
 
 ### How to use
 
-Create a settings model where you can use tags `env`, `default` and `validate`. Announce a variable and call `LoadSettings()`:
+Create a settings model where you can use tags `env`, `default` and `validate`. Announce a variable and call `Load()`:
 
 ```go
 type Settings struct {
@@ -45,7 +42,7 @@ type Settings struct {
 }
 
 var settings Settings
-err := LoadSettings(&settings)
+err := Load(&settings)
 if err != nil {
     return err
 }
@@ -57,13 +54,13 @@ The `validate` tag may contain an optional validation rule fallowing the documen
 
 ### Supported types
 
-| Type                   | Real type     |
-| -------------          | ------------- |
-| string                 | -             | 
-| boolean                | -             | 
-| any int                | -             | 
-| any uint               | -             | 
-| time.Duration          | int64         | 
+| Type          | Real type     |
+|---------------| ------------- |
+| string        | -             | 
+| boolean       | -             | 
+| ~int          | -             | 
+| ~uint         | -             | 
+| time.Duration | int64         | 
 
 ### Nested structs
 
@@ -89,8 +86,7 @@ The nested structs that added via pointer must not be necessarily initialized:
 
 ```go
 var settings Model1
-err := LoadSettings(&settings)
-if err != nil {
+if err := Load(&settings); err != nil {
     return err
 }
 ```
@@ -99,28 +95,25 @@ Nonetheless, if you want, you can do it.
 
 ```go
 var settings = Model1{Model2: new(Model2)}
-err := LoadSettings(&settings)
-if err != nil {
+if err := Load(&settings); err != nil {
     return err
 }
 ```
 
-<a name=limits></a>
-
 ## 3. Limitations
 
-The configuration model has some limitations in the way how it is arranged and used.
+The configuration model has some limitations in how it is arranged and used.
 
 ### Empty structs are not allowed
 
-If you add an empty struct to your configuration model, `LoadSettings()` returns error.
+If you add an empty struct to your configuration model, `Load()` returns error.
 
-### LoadSettings() accepts only pointer to your configuration model
+### Load() accepts only pointer to your configuration model
 
-The root model must be initialized and added to the `LoadSettings()` signature via pointer:
+The root model must be initialized and added to the `Load()` signature via pointer:
 
 ```go
-err := LoadSettings(&EnvironmentSettings)
+err := Load(&EnvironmentSettings)
 if err != nil {
     return err
 }

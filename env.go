@@ -1,5 +1,3 @@
-//go:build amd64 || arm64
-
 package settings
 
 import (
@@ -10,8 +8,8 @@ import (
 	"time"
 )
 
-// LoadSettings loads settings to a struct.
-func LoadSettings(settings interface{}) error {
+// Load loads settings to a struct.
+func Load(settings interface{}) error {
 	engine, nestedStruct := settings.(*Engine)
 	if !nestedStruct {
 		engine = newEngine(settings)
@@ -34,7 +32,7 @@ func LoadSettings(settings interface{}) error {
 			engine.Field.value.Kind() == reflect.Struct {
 			// we check whether the field is pointer or struct
 
-			err = LoadSettings(&Engine{
+			err = Load(&Engine{
 				Value: engine.Field.value,
 				Type:  engine.Field.value.Type(),
 			})
