@@ -74,9 +74,14 @@ func Load(settings interface{}) error {
 			}
 
 			switch engine.Field.value.Kind() { //nolint:exhaustive
+			case reflect.Slice:
+				// we only support slice of bytes
+				if engine.Field.value.Type().Elem().Kind() != reflect.Uint8 {
+					return unsupportedFieldError(engine.Field.envTag)
+				}
+				engine.Field.value.SetBytes([]byte(engine.Field.envValue))
 			case reflect.String:
 				engine.Field.value.SetString(engine.Field.envValue)
-
 			case reflect.Float64:
 				engine.Field.float64Value, err = strconv.ParseFloat(engine.Field.envValue, 64)
 				if err != nil {
