@@ -132,6 +132,10 @@ type simpleConfig struct {
 	Timeout time.Duration `default:"5s"        env:"DB_TIMEOUT"`
 }
 
+type pigPort struct {
+	Port uint16 `env:"BIG_PORT" validate:"required"`
+}
+
 func TestLoadUsingReflect(t *testing.T) {
 	// ENV settings PORT=80;DB=db/file;CACHE=5;BADCACHE1=i;BADCACHE2=300
 	t.Setenv("PORT", "80")
@@ -152,6 +156,7 @@ func TestLoadUsingReflect(t *testing.T) {
 	t.Setenv("HAS_DB", "true")
 	t.Setenv("DOMAIN", "3lines.club")
 	t.Setenv("EMAIL", "email@3lines.club")
+	t.Setenv("BIG_PORT", "25060")
 
 	var goodSettings1 goodEnvironmentSettings1
 	var goodSettings3withEmptyString goodEnvironmentSettings3withEmptyString
@@ -198,6 +203,7 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"not_set_env", &simple, nil},
 		{"omitted field", &settingsWithStruct3{}, nil},
 		{"an example", &Settings{}, nil},
+		{"big port", &pigPort{}, nil},
 	}
 
 	var err error
@@ -210,6 +216,7 @@ func TestLoadUsingReflect(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 			err = Load(tt.settings)
+			t.Logf("settings: %v", tt.settings)
 
 			if errors.Is(err, tt.wantErr) {
 				if err != nil {
