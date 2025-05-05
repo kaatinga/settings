@@ -176,7 +176,7 @@ func TestLoadUsingReflect(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		settings interface{}
+		settings any
 		wantErr  error
 	}{
 		{"ok1", &goodSettings1, nil},

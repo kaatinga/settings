@@ -10,7 +10,7 @@ import (
 )
 
 // Load loads settings to a struct.
-func Load(settings interface{}) error {
+func Load(settings any) error {
 	engine, nestedStruct := settings.(*Engine)
 	if !nestedStruct {
 		engine = newEngine(settings)
