@@ -10,15 +10,15 @@ import (
 
 // Engine — data model to process settings.
 type Engine struct {
-	Value          reflect.Value
 	Type           reflect.Type
-	NumberOfFields int
 	Validate       *validator.Validate
+	Value          reflect.Value
 	Field          Loop
+	NumberOfFields int
 }
 
 // newEngine creates new model to process settings.
-func newEngine(settings interface{}) *Engine {
+func newEngine(settings any) *Engine {
 	return &Engine{
 		Value:    reflect.ValueOf(settings),
 		Type:     reflect.TypeOf(settings),
@@ -28,22 +28,22 @@ func newEngine(settings interface{}) *Engine {
 
 // Loop — variables that used during field processing.
 type Loop struct {
+	value             reflect.Value
 	envTag            string
 	envValue          string
 	validationRule    string
+	defaultSetting    string
+	field             reflect.StructField
 	durationValue     time.Duration
 	int64Value        int64
 	uint64Value       uint64
-	field             reflect.StructField
-	value             reflect.Value
+	float64Value      float64
 	hasEnvTag         bool
 	mustBeOmitted     bool
 	hasEnvValue       bool
 	mustBeValidated   bool
 	required          bool
-	defaultSetting    string
 	hasDefaultSetting bool
-	float64Value      float64
 }
 
 // exceedsMaximumUint returns true if the value exceeds the maximum uint value.
