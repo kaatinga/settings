@@ -7,7 +7,7 @@
 
 # settings
 
-The package looks up necessary environment variables and uses them to specify settings for your application. In addition, the package validates the final struct using standard `validate` tags.
+`settings` is a Go package that simplifies configuration management for your application. It automatically loads environment variables into your configuration structs, supports default values, and validates fields using standard `validate` tags. With `settings`, you can define your application's configuration in a type-safe, declarative way—eliminating boilerplate code and reducing the risk of misconfiguration.
 
 ## Contents
 
