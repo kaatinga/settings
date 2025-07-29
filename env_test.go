@@ -157,6 +157,7 @@ func TestLoadUsingReflect(t *testing.T) {
 	t.Setenv("DOMAIN", "3lines.club")
 	t.Setenv("EMAIL", "email@3lines.club")
 	t.Setenv("BIG_PORT", "25060")
+	t.Setenv("STRING_SLICE", "a,b,c")
 
 	var goodSettings1 goodEnvironmentSettings1
 	var goodSettings3withEmptyString goodEnvironmentSettings3withEmptyString
@@ -173,6 +174,9 @@ func TestLoadUsingReflect(t *testing.T) {
 	var complex3 = settingsWithStruct2{}
 	var requiredField = settingsWithRequiredTag{}
 	var simple simpleConfig
+	var stringSlice struct {
+		StringSlice []string `env:"STRING_SLICE"`
+	}
 
 	tests := []struct {
 		name     string
@@ -204,6 +208,7 @@ func TestLoadUsingReflect(t *testing.T) {
 		{"omitted field", &settingsWithStruct3{}, nil},
 		{"an example", &Settings{}, nil},
 		{"big port", &pigPort{}, nil},
+		{"string slice", &stringSlice, nil},
 	}
 
 	var err error
