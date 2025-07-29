@@ -54,13 +54,15 @@ The `validate` tag may contain an optional validation rule fallowing the documen
 
 ### Supported types
 
-| Type          | Real type     |
-|---------------| ------------- |
-| string        | -             | 
-| boolean       | -             | 
-| ~int          | -             | 
-| ~uint         | -             | 
-| time.Duration | int64         | 
+| Type           | Real type      |
+|----------------|----------------|
+| string         | -              | 
+| boolean        | -              | 
+| ~int           | -              | 
+| ~uint          | -              | 
+| time.Duration  | int64          | 
+| []string       | []string       |
+| []byte         | []byte         |
 
 ### Nested structs
 
