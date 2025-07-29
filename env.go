@@ -143,7 +143,7 @@ func Load(settings any) error {
 			return err
 		}
 
-		if err = runCustomValidation(engine, err); err != nil {
+		if err = runCustomValidation(engine); err != nil {
 			return err
 		}
 	}
@@ -151,11 +151,11 @@ func Load(settings any) error {
 	return nil
 }
 
-func runCustomValidation(engine *Engine, err error) error {
+func runCustomValidation(engine *Engine) error {
 	if to, validatable := engine.Value.Interface().(interface {
 		Validate() error
 	}); validatable {
-		if err = to.Validate(); err != nil {
+		if err := to.Validate(); err != nil {
 			return err
 		}
 	}
