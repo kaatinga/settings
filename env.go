@@ -139,9 +139,25 @@ func Load(settings any) error {
 	}
 
 	if !nestedStruct {
-		// we execute entire struct validation
-		return engine.Validate.Struct(engine.Value.Interface())
+		if err = engine.Validate.Struct(engine.Value.Interface()); err != nil {
+			return err
+		}
+
+		if err = runCustomValidation(engine, err); err != nil {
+			return err
+		}
 	}
 
+	return nil
+}
+
+func runCustomValidation(engine *Engine, err error) error {
+	if to, validatable := engine.Value.Interface().(interface {
+		Validate() error
+	}); validatable {
+		if err = to.Validate(); err != nil {
+			return err
+		}
+	}
 	return nil
 }
