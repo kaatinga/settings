@@ -1,7 +1,6 @@
 package settings
 
 import (
-	"fmt"
 	"os"
 	"reflect"
 	"strconv"
@@ -76,12 +75,15 @@ func Load(settings any) error {
 
 			switch engine.Field.value.Kind() { //nolint:exhaustive
 			case reflect.Slice:
-				// we only support slice of bytes
-				if engine.Field.value.Type().Elem().Kind() != reflect.Uint8 {
-					fmt.Println("ops slice")
+				switch engine.Field.value.Type().Elem().Kind() {
+				case reflect.Uint8:
+					engine.Field.value.SetBytes([]byte(engine.Field.envValue))
+				case reflect.String:
+					stringSlice := strings.Split(engine.Field.envValue, ",")
+					engine.Field.value.Set(reflect.ValueOf(stringSlice))
+				default:
 					return unsupportedFieldError(engine.Field.envTag)
 				}
-				engine.Field.value.SetBytes([]byte(engine.Field.envValue))
 			case reflect.String:
 				engine.Field.value.SetString(engine.Field.envValue)
 			case reflect.Float64:
