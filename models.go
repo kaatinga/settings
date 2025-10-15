@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"math"
 	"reflect"
 	"strings"
 	"time"
@@ -59,14 +60,23 @@ func (field *Loop) exceedsMaximumUint() bool {
 
 // notInIntRange returns true if the value is not in the int range.
 func (field *Loop) notInIntRange() bool {
-	var kind reflect.Kind
-	if kind = field.value.Kind(); kind == reflect.Int {
-		kind = reflect.Int64
+	kind := field.value.Kind()
+	var minimum, maximum int64
+
+	switch kind {
+	case reflect.Int8:
+		minimum, maximum = math.MinInt8, math.MaxInt8
+	case reflect.Int16:
+		minimum, maximum = math.MinInt16, math.MaxInt16
+	case reflect.Int32:
+		minimum, maximum = math.MinInt32, math.MaxInt32
+	case reflect.Int, reflect.Int64:
+		minimum, maximum = math.MinInt64, math.MaxInt64
+	default:
+		return false
 	}
 
-	//nolint:gomnd // it is a formula
-	return field.int64Value > 1<<((2<<(int64(kind)-1))-1)-1 ||
-		field.int64Value < -1<<((2<<(int64(kind)-1))-1)
+	return field.int64Value > maximum || field.int64Value < minimum
 }
 
 // getStruct checks and returns a struct to process.
