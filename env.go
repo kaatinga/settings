@@ -114,7 +114,7 @@ func Load(settings any) error {
 
 					engine.Field.durationValue, err = time.ParseDuration(engine.Field.envValue)
 					if err != nil {
-						return err
+						return incorrectFieldValueError(engine.Field.envTag)
 					}
 					engine.Field.int64Value = engine.Field.durationValue.Nanoseconds()
 				} else {

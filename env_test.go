@@ -124,6 +124,26 @@ type stringSliceConfig struct {
 	StringSlice []string `env:"STRING_SLICE"`
 }
 
+type Uint8Struct struct {
+	Value uint8 `env:"UINT8"`
+}
+
+type BadUint8Struct struct {
+	Value uint8 `env:"BAD_UINT8"`
+}
+
+type Float64Struct struct {
+	Value float64 `env:"FLOAT"`
+}
+
+type BadFloat64Struct struct {
+	Value float64 `env:"BAD_FLOAT"`
+}
+
+type badSettingsWithDuration struct {
+	Timeout time.Duration `env:"BAD_TIMEOUT"`
+}
+
 // setupTestEnvironment sets up all required environment variables for testing
 func setupTestEnvironment(t *testing.T) {
 	t.Helper()
@@ -149,6 +169,14 @@ func setupTestEnvironment(t *testing.T) {
 		"EMAIL":        "email@example.com",
 		"BIG_PORT":     "25060",
 		"STRING_SLICE": "a,b,c",
+
+		// new env vars for the uint8/float64 tests
+		"UINT8":     "200",       // valid uint8
+		"BAD_UINT8": "999",       // out of uint8 range -> should fail
+		"BAD_FLOAT": "notafloat", // invalid float -> should fail
+
+		// new env var for bad duration test
+		"BAD_TIMEOUT": "notaduration", // invalid duration -> should fail
 	}
 
 	for key, value := range envVars {
@@ -349,6 +377,43 @@ func TestLoad(t *testing.T) {
 			expectError: false,
 			description: "Should handle string slice from comma-separated values",
 		},
+		{
+			name:        "settings_with_uint8_ok",
+			settings:    &Uint8Struct{},
+			wantErr:     nil,
+			expectError: false,
+			description: "Should handle uint8 type correctly",
+		},
+		{
+			name:        "settings_with_uint8_fail",
+			settings:    &BadUint8Struct{},
+			wantErr:     NewIncorrectFieldValueError("BAD_UINT8"),
+			expectError: true,
+			description: "Should fail when uint8 value is out of range",
+		},
+		{
+			name:        "settings_with_float64_ok_explicit",
+			settings:    &Float64Struct{},
+			wantErr:     nil,
+			expectError: false,
+			description: "Should handle float64 type correctly (explicit struct)",
+		},
+		{
+			name:        "settings_with_float64_fail",
+			settings:    &BadFloat64Struct{},
+			wantErr:     NewIncorrectFieldValueError("BAD_FLOAT"),
+			expectError: true,
+			description: "Should fail when float64 cannot be parsed",
+		},
+
+		// new failing duration test
+		{
+			name:        "settings_with_bad_duration_should_fail",
+			settings:    &badSettingsWithDuration{},
+			wantErr:     NewIncorrectFieldValueError("BAD_TIMEOUT"),
+			expectError: true,
+			description: "Should fail when duration cannot be parsed",
+		},
 	}
 
 	for _, tt := range tests {
@@ -437,6 +502,9 @@ func createFreshInstance(original any) any {
 		return &pigPort{}
 	case *stringSliceConfig:
 		return &stringSliceConfig{}
+	// new case for the bad duration struct
+	case *badSettingsWithDuration:
+		return &badSettingsWithDuration{}
 	default:
 		return original
 	}
