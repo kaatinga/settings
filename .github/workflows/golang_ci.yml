@@ -1,0 +1,82 @@
+name: Go CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.25'
+          cache: true
+          cache-dependency-path: |
+            go.sum
+            go.work.sum
+
+      - name: Verify dependencies
+        run: go mod verify
+
+      - name: Format check (gofmt)
+        run: |
+          if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+            echo "The following files are not formatted:"
+            gofmt -s -l .
+            exit 1
+          fi
+
+      - name: Go vet
+        run: go vet ./...
+
+      - name: Cache staticcheck binary
+        uses: actions/cache@v4
+        with:
+          path: ~/go/bin/staticcheck
+          key: ${{ runner.os }}-staticcheck-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-staticcheck-
+
+      - name: Install staticcheck
+        run: |
+          if [ ! -f ~/go/bin/staticcheck ]; then
+            go install honnef.co/go/tools/cmd/staticcheck@latest
+          fi
+
+      - name: Staticcheck
+        run: staticcheck ./...
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: latest
+          args: --timeout=5m
+
+      - name: Build check
+        run: go build ./...
+
+      - name: Run tests
+        run: go test -v ./...
+
+      - name: Cache gosec binary
+        uses: actions/cache@v4
+        with:
+          path: ~/go/bin/gosec
+          key: ${{ runner.os }}-gosec-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-gosec-
+
+      - name: Security scan (gosec)
+        uses: securego/gosec@master
+        with:
+          args: ./...
