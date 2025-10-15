@@ -144,39 +144,51 @@ type badSettingsWithDuration struct {
 	Timeout time.Duration `env:"BAD_TIMEOUT"`
 }
 
+type BadInt32Low struct {
+	Value int32 `env:"BAD_INT32_LOW"`
+}
+
+type BadInt32High struct {
+	Value int32 `env:"BAD_INT32_HIGH"`
+}
+
+// new failing validate-tags struct
+type settingsWithValidateTags struct {
+	Value int `env:"BAD_VALIDATE" validate:"min=10"`
+}
+
 // setupTestEnvironment sets up all required environment variables for testing
 func setupTestEnvironment(t *testing.T) {
 	t.Helper()
 
 	envVars := map[string]string{
-		"PORT":         "80",
-		"FLOAT":        "80.1",
-		"DB":           "db/file",
-		"CACHE":        "5",
-		"BADCACHE1":    "i",
-		"BADCACHE2":    "300",
-		"BADCACHE3":    "-1",
-		"LOG_LEVEL":    "debug",
-		"SYSLOG_LEVEL": "info",
-		"TIMEOUT":      "20s",
-		"BADPORT":      "a",
-		"STDOUT":       "true",
-		"SESSION":      "session",
-		"KEY_PATH":     "/etc",
-		"PROD":         "true",
-		"HAS_DB":       "true",
-		"DOMAIN":       "example.com",
-		"EMAIL":        "email@example.com",
-		"BIG_PORT":     "25060",
-		"STRING_SLICE": "a,b,c",
-
-		// new env vars for the uint8/float64 tests
-		"UINT8":     "200",       // valid uint8
-		"BAD_UINT8": "999",       // out of uint8 range -> should fail
-		"BAD_FLOAT": "notafloat", // invalid float -> should fail
-
-		// new env var for bad duration test
-		"BAD_TIMEOUT": "notaduration", // invalid duration -> should fail
+		"PORT":           "80",
+		"FLOAT":          "80.1",
+		"DB":             "db/file",
+		"CACHE":          "5",
+		"BADCACHE1":      "i",
+		"BADCACHE2":      "300",
+		"BADCACHE3":      "-1",
+		"LOG_LEVEL":      "debug",
+		"SYSLOG_LEVEL":   "info",
+		"TIMEOUT":        "20s",
+		"BADPORT":        "a",
+		"STDOUT":         "true",
+		"SESSION":        "session",
+		"KEY_PATH":       "/etc",
+		"PROD":           "true",
+		"HAS_DB":         "true",
+		"DOMAIN":         "example.com",
+		"EMAIL":          "email@example.com",
+		"BIG_PORT":       "25060",
+		"STRING_SLICE":   "a,b,c",
+		"UINT8":          "200",
+		"BAD_UINT8":      "999",
+		"BAD_FLOAT":      "notafloat",
+		"BAD_TIMEOUT":    "notaduration",
+		"BAD_INT32_LOW":  "-2147483649",
+		"BAD_INT32_HIGH": "2147483648",
+		"BAD_VALIDATE":   "5",
 	}
 
 	for key, value := range envVars {
@@ -414,6 +426,27 @@ func TestLoad(t *testing.T) {
 			expectError: true,
 			description: "Should fail when duration cannot be parsed",
 		},
+		{
+			name:        "settings_int32_value_too_low_should_fail",
+			settings:    &BadInt32Low{},
+			wantErr:     NewIncorrectFieldValueError("BAD_INT32_LOW"),
+			expectError: true,
+			description: "Should fail when int32 value is below int32 min",
+		},
+		{
+			name:        "settings_int32_value_too_high_should_fail",
+			settings:    &BadInt32High{},
+			wantErr:     NewIncorrectFieldValueError("BAD_INT32_HIGH"),
+			expectError: true,
+			description: "Should fail when int32 value is above int32 max",
+		},
+		{
+			name:        "settings_with_validate_tags_fail",
+			settings:    &settingsWithValidateTags{},
+			wantErr:     nil,
+			expectError: true,
+			description: "Should fail when validate:min constraint is not satisfied",
+		},
 	}
 
 	for _, tt := range tests {
@@ -502,9 +535,12 @@ func createFreshInstance(original any) any {
 		return &pigPort{}
 	case *stringSliceConfig:
 		return &stringSliceConfig{}
-	// new case for the bad duration struct
-	case *badSettingsWithDuration:
-		return &badSettingsWithDuration{}
+	case *BadInt32Low:
+		return &BadInt32Low{}
+	case *BadInt32High:
+		return &BadInt32High{}
+	case *settingsWithValidateTags:
+		return &settingsWithValidateTags{}
 	default:
 		return original
 	}
