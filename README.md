@@ -3,8 +3,7 @@
 [![codecov](https://codecov.io/gh/kaatinga/settings/branch/main/graph/badge.svg)](https://codecov.io/gh/kaatinga/settings)
 [![Go CI](https://github.com/kaatinga/settings/actions/workflows/golang_ci.yml/badge.svg)](https://github.com/kaatinga/settings/actions/workflows/golang_ci.yml)
 [![help wanted](https://img.shields.io/badge/Help%20wanted-True-yellow.svg)](https://github.com/kaatinga/settings/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22)
-[![CodeQL](https://github.com/kaatinga/settings/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/kaatinga/settings/security/code-scanning)
-[![Vulnerabilities](https://img.shields.io/github/vulnerabilities/kaatinga/settings)](https://github.com/kaatinga/settings/security/dependabot)
+[![CodeQL](https://github.com/kaatinga/settings/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/kaatinga/settings/actions/workflows/github-code-scanning/codeql)
 
 # settings
 
